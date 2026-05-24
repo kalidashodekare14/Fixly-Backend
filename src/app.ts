@@ -1,5 +1,5 @@
 // External dependencies
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 
 // Initialize Express app
@@ -22,7 +22,7 @@ app.use((_req: Request, res: Response) => {
 });
 
 // Global error handler
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+app.use((err: Error, _req: Request, res: Response) => {
   console.error("Unhandled error:", err);
   res.status(500).json({ error: "Internal server error" });
 });
