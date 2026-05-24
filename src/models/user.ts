@@ -53,7 +53,7 @@ userSchema.pre<IUser>("save", async function () {
     const salt = await bcrypt.genSalt(SALT_ROUNDS);
     this.password = await bcrypt.hash(this.password, salt);
   } catch (error) {
-    throw error;
+    throw new Error("Error hashing password: " + (error as Error).message);
   }
 });
 
