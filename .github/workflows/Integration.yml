@@ -1,0 +1,47 @@
+name: Backend CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - development
+
+  pull_request:
+    branches:
+      - main
+      - development
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x, 24.x]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Node.js setup
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      # Dependencies install
+      - name: Install Dependencies
+        run: npm ci
+
+      # TypeScript build check
+      - name: Build Project
+        run: npm run build
+
+      # ESLint check
+      - name: Run Linter
+        run: npm run lint
+
+      # Run tests
+      - name: Run Tests
+        run: npm test

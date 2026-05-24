@@ -8,11 +8,25 @@
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
     "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix"
+    "lint:fix": "eslint src --ext .ts --fix",
+    "test": "jest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "nodejs",
+    "expressjs",
+    "typescript",
+    "mongodb",
+    "mongoose",
+    "rest-api",
+    "jwt-authentication",
+    "backend",
+    "api",
+    "eslint",
+    "github-actions",
+    "ci-cd"
+  ],
+  "author": "Kalidash Odekare",
+  "license": "MIT",
   "type": "commonjs",
   "dependencies": {
     "bcryptjs": "^3.0.3",
@@ -25,13 +39,16 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.9.0",
     "@typescript-eslint/eslint-plugin": "^8.59.4",
     "@typescript-eslint/parser": "^5.0.1",
     "eslint": "^8.52.0",
+    "jest": "^30.4.2",
     "nodemon": "^3.1.14",
     "prettier": "^3.1.0",
     "prettier-eslint": "^16.1.2",
+    "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
     "typescript": "^4.4.4"
   }
