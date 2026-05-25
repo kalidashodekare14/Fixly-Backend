@@ -4,6 +4,7 @@ import cors from 'cors';
 
 // Internal dependencies
 import authRoutes from './modules/auth/authRoutes';
+import userRoutes from './modules/user/userRoutes';
 
 // Initialize Express app
 const app = express();
@@ -22,6 +23,7 @@ app.get('/', (_req: Request, res: Response) => {
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/user', userRoutes);
 
 // Global error handler
 app.use((err: Error, _req: Request, res: Response) => {
