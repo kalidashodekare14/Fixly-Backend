@@ -30,7 +30,7 @@ const loginUser = async (userData: IUser) => {
     throw new Error('Invalid email or password');
   }
 
-  const token = generateToken({ id: user._id });
+  const token = generateToken({ id: user._id.toString() });
 
   const userObject = user.toObject();
   delete (userObject as { password?: string }).password;
