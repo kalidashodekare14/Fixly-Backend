@@ -3,6 +3,16 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { config } from '../config/env';
 import sendResponse from '../utils/sendResponse';
 
+declare global {
+  namespace Express {
+    interface Request {
+      user: {
+        id: string;
+      };
+    }
+  }
+}
+
 export const authMiddleware = (
   req: Request,
   res: Response,
@@ -20,7 +30,7 @@ export const authMiddleware = (
   const token = authHeader.split(' ')[1];
   try {
     const decoded = jwt.verify(token, config.JWT_SECRET) as JwtPayload;
-    (req as any).user = decoded;
+    req.user = decoded as { id: string };
     next();
   } catch (error) {
     return sendResponse(res, {

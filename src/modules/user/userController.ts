@@ -2,9 +2,19 @@ import { Request, Response } from 'express';
 import { userInfo } from './userService';
 import sendResponse from '../../utils/sendResponse';
 
+declare global {
+  namespace Express {
+    interface Request {
+      user: {
+        id: string;
+      };
+    }
+  }
+}
+
 const userInfoController = async (req: Request, res: Response) => {
   try {
-    const userId = (req as any).user.id;
+    const userId = req.user.id;
     const user = await userInfo(userId);
     sendResponse(res, {
       statusCode: 200,
