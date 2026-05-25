@@ -1,6 +1,6 @@
-import app from "./app";
-import { connectDB } from "./config/db";
-import { config } from "./config/env";
+import app from './app';
+import { connectDB } from './config/db';
+import { config } from './config/env';
 
 const server = async (): Promise<void> => {
   try {
