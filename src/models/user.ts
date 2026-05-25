@@ -14,7 +14,7 @@ export interface IUser extends Document {
     city?: string;
     state?: string;
     zipCode?: string;
-  }[];
+  };
   bio?: string;
   isVerified: boolean;
   averageRating: number;
@@ -55,14 +55,12 @@ const userSchema = new Schema<IUser>(
       type: String,
       trim: true,
     },
-    address: [
-      {
-        street: { type: String, trim: true },
-        city: { type: String, trim: true },
-        state: { type: String, trim: true },
-        zipCode: { type: String, trim: true },
-      },
-    ],
+    address: {
+      street: { type: String, trim: true },
+      city: { type: String, trim: true },
+      state: { type: String, trim: true },
+      zipCode: { type: String, trim: true },
+    },
     bio: {
       type: String,
       trim: true,

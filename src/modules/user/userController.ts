@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { userInfo } from './userService';
+import { userInfo, updateUserInfo } from './userService';
 import sendResponse from '../../utils/sendResponse';
 
 const userInfoController = async (req: Request, res: Response) => {
@@ -21,4 +21,24 @@ const userInfoController = async (req: Request, res: Response) => {
   }
 };
 
-export { userInfoController };
+const updateUserInfoController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const updateData = req.body;
+    const user = await updateUserInfo(userId, updateData);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'User information updated successfully',
+      data: user,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: (error as Error).message,
+    });
+  }
+};
+
+export { userInfoController, updateUserInfoController };
