@@ -8,6 +8,17 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: 'user' | 'provider' | 'admin';
+  phone?: string;
+  address?: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  }[];
+  bio?: string;
+  isVerified: boolean;
+  averageRating: number;
+  totalReviews: number;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -39,6 +50,34 @@ const userSchema = new Schema<IUser>(
         message: 'Role must be user, provider, or admin',
       },
       default: 'user',
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    address: [
+      {
+        street: { type: String, trim: true },
+        city: { type: String, trim: true },
+        state: { type: String, trim: true },
+        zipCode: { type: String, trim: true },
+      },
+    ],
+    bio: {
+      type: String,
+      trim: true,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    totalReviews: {
+      type: Number,
+      default: 0,
     },
   },
   {

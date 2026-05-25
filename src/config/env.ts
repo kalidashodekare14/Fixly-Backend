@@ -5,5 +5,5 @@ export const config = {
   PORT: process.env.PORT || 5000,
   MONGO_URL: process.env.MONGO_URL || 'mongodb://localhost:27017/fixly',
   BCRYPT_SALT_ROUNDS: process.env.BCRYPT_SALT_ROUNDS || 10,
-  jwtSecret: process.env.JWT_SECRET || 'df4d65e6r6dfd65re64e6r56f6e4re65f',
+  JWT_SECRET: process.env.JWT_SECRET || 'df4d65e6r6dfd65re64e6r56f6e4re65f',
 };
