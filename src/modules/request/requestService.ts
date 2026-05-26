@@ -26,4 +26,31 @@ const createRequest = async (userId: string, requestData: IRequest) => {
   return { request, offers };
 };
 
-export { createRequest };
+const getRequest = async (requestId: string) => {
+  const request = await Request.findOne({ user: requestId }).populate(
+    'user',
+    'name email',
+  );
+  console.log('Retrieved request:', request);
+  return request;
+};
+
+const requestUpdate = async (userId: string, updateData: Partial<IRequest>) => {
+  const request = await Request.findOne({ user: userId });
+  if (!request) {
+    throw new Error('Request not found');
+  }
+  if (request.status !== 'pending') {
+    throw new Error('Request cannot be updated');
+  }
+  const { status, ...safeRequestData } = updateData;
+  const updatedRequest = await Request.findByIdAndUpdate(
+    request._id,
+    safeRequestData,
+    { returnDocument: 'after' },
+  );
+
+  return updatedRequest;
+};
+
+export { createRequest, getRequest, requestUpdate };

@@ -15,7 +15,7 @@ interface IRequest {
     coordinates: number[];
   };
   dateline: Date;
-  status: 'pending' | 'in_progress' | 'completed' | 'cancelled';
+  status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled';
 }
 
 export { IRequest };
