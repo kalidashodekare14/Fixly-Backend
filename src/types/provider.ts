@@ -10,6 +10,8 @@ interface IProvider {
     city: string;
     division: string;
     postalCode: string;
+    type: string;
+    coordinates: number[];
   };
 
   rating: number;
