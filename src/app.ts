@@ -6,6 +6,7 @@ import cors from 'cors';
 import authRoutes from './modules/auth/authRoutes';
 import userRoutes from './modules/user/userRoutes';
 import providerRoutes from './modules/provider/providerRoutes';
+import requestRoutes from './modules/request/requestRoutes';
 
 // Initialize Express app
 const app = express();
@@ -26,6 +27,7 @@ app.get('/', (_req: Request, res: Response) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/provider', providerRoutes);
+app.use('/api/request', requestRoutes);
 
 // Global error handler
 app.use((err: Error, _req: Request, res: Response) => {
