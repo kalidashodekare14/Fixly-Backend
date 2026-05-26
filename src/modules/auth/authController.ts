@@ -1,20 +1,24 @@
 import { Request, Response } from 'express';
 import { registerUser, loginUser } from './authService';
+import sendResponse from '../../utils/sendResponse';
 
 // Controller for user registration
 const signUpController = async (req: Request, res: Response) => {
   try {
     const result = await registerUser(req.body);
-    res.status(200).send({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: 'Sign up successful',
       data: result,
     });
   } catch (error) {
     console.error('Sign up error:', error);
-    res.status(500).send({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: 'Internal server error',
+      data: null,
     });
   }
 };
@@ -23,16 +27,19 @@ const signUpController = async (req: Request, res: Response) => {
 const loginController = async (req: Request, res: Response) => {
   try {
     const result = await loginUser(req.body);
-    res.status(200).send({
+    sendResponse(res, {
+      statusCode: 200,
       success: true,
       message: 'Login successful',
       data: result,
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).send({
+    sendResponse(res, {
+      statusCode: 500,
       success: false,
       message: 'Internal server error',
+      data: null,
     });
   }
 };
