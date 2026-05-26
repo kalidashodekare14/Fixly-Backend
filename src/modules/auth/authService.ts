@@ -4,6 +4,7 @@ import generateToken from '../../utils/tokenService';
 // Internal dependencies
 import IUser from '../../types/user';
 import User from '../../models/user';
+import Provider from '../../models/provider';
 
 const registerUser = async (userData: IUser) => {
   const { name, email, password, role } = userData;
@@ -14,6 +15,12 @@ const registerUser = async (userData: IUser) => {
   }
   // save user data
   const newUser = await User.create({ name, email, password, role });
+
+  if (role === 'provider') {
+    // Create provider profile for the new user
+    await Provider.create({ user: newUser._id });
+  }
+
   return newUser;
 };
 
