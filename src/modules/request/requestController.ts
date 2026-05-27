@@ -102,11 +102,11 @@ const getOffersForRequestController = async (req: Request, res: Response) => {
     sendResponse(res, {
       statusCode: 200,
       success: true,
-      message: 'Offers retrieved successfully',
+      message: 'Offers fetched successfully',
       data: offers,
     });
   } catch (error) {
-    console.error('Error retrieving offers:', error);
+    console.error('Error fetching offers:', error);
     sendResponse(res, {
       statusCode: 500,
       success: false,

@@ -82,7 +82,7 @@ const getOffersForRequest = async (requestId: string) => {
   if (!offers) {
     throw new Error('Request not found');
   }
-
+  console.log('Offers for request:', offers);
   return offers;
 };
 
