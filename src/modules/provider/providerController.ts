@@ -1,5 +1,10 @@
 import { Request, Response } from 'express';
-import { providerInfo, providerInfoUpdate } from './providerService';
+import {
+  offerCreate,
+  providerInfo,
+  providerInfoUpdate,
+  requestInfo,
+} from './providerService';
 import sendResponse from '../../utils/sendResponse';
 
 const providerInfoController = async (req: Request, res: Response) => {
@@ -46,4 +51,51 @@ const providerInfoUpdateController = async (req: Request, res: Response) => {
   }
 };
 
-export { providerInfoController, providerInfoUpdateController };
+const requestInfoController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const offerData = await requestInfo(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: offerData,
+      message: 'Request information retrieved successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Failed to retrieve request information',
+    });
+  }
+};
+
+const offerCreateController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const offerData = await offerCreate(userId, req.body);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: offerData,
+      message: 'Offer created/updated successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Failed to create/update offer',
+    });
+  }
+};
+
+export {
+  providerInfoController,
+  providerInfoUpdateController,
+  requestInfoController,
+  offerCreateController,
+};
