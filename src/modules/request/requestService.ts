@@ -31,7 +31,7 @@ const createRequest = async (userId: string, requestData: IRequest) => {
 const getRequest = async (userId: string) => {
   const request = await Request.findOne({ user: userId }).populate(
     'user',
-    'name email',
+    'name email phone image',
   );
   console.log('Retrieved request:', request);
   return request;
@@ -75,7 +75,7 @@ const getOffersForRequest = async (requestId: string) => {
     path: 'provider',
     populate: {
       path: 'user',
-      select: 'name email phone',
+      select: 'name email phone image',
     },
   });
 
