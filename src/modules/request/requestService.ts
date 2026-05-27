@@ -68,7 +68,6 @@ const deleteRequest = async (userId: string) => {
 };
 
 const getOffersForRequest = async (requestId: string) => {
-  console.log('Fetching offers for request ID:', requestId);
   const offers = await Offer.find({
     request: requestId,
     status: { $in: ['offered', 'accepted'] },
