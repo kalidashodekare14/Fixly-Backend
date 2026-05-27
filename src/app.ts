@@ -1,5 +1,5 @@
 // External dependencies
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 
 // Internal dependencies
@@ -30,8 +30,9 @@ app.use('/api/provider', providerRoutes);
 app.use('/api/request', requestRoutes);
 
 // Global error handler
-app.use((err: Error, _req: Request, res: Response) => {
+app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
   console.error('Unhandled error:', err);
+
   res.status(500).json({ error: 'Internal server error' });
 });
 

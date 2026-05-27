@@ -1,4 +1,11 @@
-import { createRequest, getRequest, requestUpdate } from './requestService';
+import {
+  createRequest,
+  getRequest,
+  requestUpdate,
+  deleteRequest,
+  getOffersForRequest,
+  acceptOffer,
+} from './requestService';
 import { Request, Response } from 'express';
 import sendResponse from '../../utils/sendResponse';
 
@@ -26,8 +33,8 @@ const createRequestController = async (req: Request, res: Response) => {
 
 const getRequestController = async (req: Request, res: Response) => {
   try {
-    const requestId = req.user.id;
-    const request = await getRequest(requestId);
+    const userId = req.user.id;
+    const request = await getRequest(userId);
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -67,8 +74,75 @@ const updateRequestController = async (req: Request, res: Response) => {
   }
 };
 
+const deleteRequestController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    await deleteRequest(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Request deleted successfully',
+      data: null,
+    });
+  } catch (error) {
+    console.error('Error deleting request:', error);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
+const getOffersForRequestController = async (req: Request, res: Response) => {
+  try {
+    const requestId = req.params.requestId.toString();
+    const offers = await getOffersForRequest(requestId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Offers retrieved successfully',
+      data: offers,
+    });
+  } catch (error) {
+    console.error('Error retrieving offers:', error);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
+const acceptOfferController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const offerId = req.params.offerId.toString();
+    await acceptOffer(userId, offerId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Offer accepted successfully',
+      data: null,
+    });
+  } catch (error) {
+    console.error('Error accepting offer:', error);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
 export {
   createRequestController,
   getRequestController,
   updateRequestController,
+  deleteRequestController,
+  getOffersForRequestController,
+  acceptOfferController,
 };

@@ -6,7 +6,7 @@ interface IOffer {
   offeredPrice?: number;
   message?: string;
   estimatedTime?: Date;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'pending' | 'offered' | 'accepted' | 'rejected';
 }
 
 export { IOffer };
