@@ -10,7 +10,15 @@ const userInfo = async (userId: string) => {
 };
 
 const updateUserInfo = async (userId: string, updateData: IUser) => {
-  const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
+  const updatePayload = Object.fromEntries(
+    Object.entries(updateData).filter(
+      ([_, value]) => value !== undefined && value !== null,
+    ),
+  );
+
+  const user = await User.findByIdAndUpdate(userId, updatePayload, {
+    new: true,
+  });
   if (!user) {
     throw new Error('User not found');
   }

@@ -24,7 +24,12 @@ const userInfoController = async (req: Request, res: Response) => {
 const updateUserInfoController = async (req: Request, res: Response) => {
   try {
     const userId = req.user.id;
-    const updateData = req.body;
+    const updateData = { ...req.body };
+
+    if (req.file) {
+      updateData.image = req.file.path;
+    }
+
     const user = await updateUserInfo(userId, updateData);
     sendResponse(res, {
       statusCode: 200,

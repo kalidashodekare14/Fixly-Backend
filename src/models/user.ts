@@ -4,6 +4,7 @@ import mongoose, { Document, Schema } from 'mongoose';
 const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
 
 export interface IUser extends Document {
+  image?: string;
   name: string;
   email: string;
   password: string;
@@ -24,6 +25,10 @@ export interface IUser extends Document {
 
 const userSchema = new Schema<IUser>(
   {
+    image: {
+      type: String,
+      trim: true,
+    },
     name: {
       type: String,
       required: [true, 'Name is required'],

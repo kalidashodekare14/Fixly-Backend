@@ -4,9 +4,15 @@ const router = express.Router();
 import { authMiddleware } from '../../middlewares/authMiddleware';
 // Controllers
 import { userInfoController, updateUserInfoController } from './userController';
+import { upload } from '../../config/multerStorage';
 
 // Routes
 router.get('/', authMiddleware, userInfoController);
-router.put('/', authMiddleware, updateUserInfoController);
+router.put(
+  '/',
+  authMiddleware,
+  upload.single('image'),
+  updateUserInfoController,
+);
 
 export default router;
