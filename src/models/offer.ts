@@ -24,7 +24,7 @@ const offerSchama = new mongoose.Schema<IOffer>(
     },
     status: {
       type: String,
-      enum: ['pending', 'accepted', 'rejected'],
+      enum: ['pending', 'offered', 'accepted', 'rejected'],
       default: 'pending',
     },
   },
