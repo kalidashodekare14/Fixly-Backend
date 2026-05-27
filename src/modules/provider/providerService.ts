@@ -4,6 +4,7 @@ import user from '../../models/user';
 import Offer from '../../models/offer';
 
 interface IUserData {
+  image?: string;
   name?: string;
   email?: string;
   phone?: string;
@@ -21,39 +22,44 @@ const providerInfo = async (providerId: string) => {
     .findOne({
       user: providerId,
     })
-    .populate('user', 'name email phone');
+    .populate('user', 'name email phone image');
 
   return providerData;
 };
 
-const providerInfoUpdate = async (
-  providerId: string,
-  data: IProviderUpdate,
-) => {
-  // user update data
+const providerInfoUpdate = async (userId: string, data: IProviderUpdate) => {
   const userData: IUserData = {};
+  const providerData: IProviderUpdate = {};
+
+  // ----------------------USER-----------------------
   if (data.name) userData.name = data.name;
   if (data.email) userData.email = data.email;
   if (data.phone) userData.phone = data.phone;
 
-  // provider update data
-  const providerData: IProviderUpdate = {};
-  if (data.services) providerData.services = data.services;
+  // ----------------------PROVIDER-----------------------
+
+  if (data.services !== undefined) providerData.services = data.services;
   if (data.experience !== undefined) providerData.experience = data.experience;
-  if (data.skills) providerData.skills = data.skills;
-  if (data.location) providerData.location = data.location;
-  if (data.availableStatus) providerData.availableStatus = data.availableStatus;
+  if (data.skills !== undefined) providerData.skills = data.skills;
+  if (data.location !== undefined) providerData.location = data.location;
+  if (data.availableStatus !== undefined)
+    providerData.availableStatus = data.availableStatus;
   if (data.rate !== undefined) providerData.rate = data.rate;
-  if (data.rateType) providerData.rateType = data.rateType;
+  if (data.rateType !== undefined) providerData.rateType = data.rateType;
+
+  // ----------------------IMAGE-----------------------
+  if (data.image !== undefined) {
+    userData.image = data.image;
+  }
 
   // User data to update
-  await user.findByIdAndUpdate(providerId, userData, {
+  await user.findByIdAndUpdate(userId, userData, {
     returnDocument: 'after',
   });
   // Provider data to update
   const providerDataUpdate = await provider.findOneAndUpdate(
     {
-      user: providerId,
+      user: userId,
     },
     providerData,
     {

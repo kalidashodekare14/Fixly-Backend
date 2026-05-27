@@ -31,9 +31,14 @@ const providerInfoController = async (req: Request, res: Response) => {
 
 const providerInfoUpdateController = async (req: Request, res: Response) => {
   try {
-    const providerId = req.user.id;
-    const updateData = req.body;
-    const providerData = await providerInfoUpdate(providerId, updateData);
+    const userId = req.user.id;
+    const updateData = { ...req.body };
+
+    if (req.file) {
+      updateData.image = req.file.path;
+    }
+
+    const providerData = await providerInfoUpdate(userId, updateData);
     sendResponse(res, {
       statusCode: 200,
       success: true,

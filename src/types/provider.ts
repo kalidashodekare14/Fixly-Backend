@@ -23,6 +23,7 @@ interface IProvider {
 }
 
 interface IProviderUpdate {
+  image?: string;
   name?: string;
   email?: string;
   phone?: string;
