@@ -12,7 +12,21 @@ import sendResponse from '../../utils/sendResponse';
 const createRequestController = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id; // Assuming user ID is available in req.user
-    const requestData = req.body;
+    let location = null;
+    if (req.body.location) {
+      location = JSON.parse(req.body.location);
+    }
+
+    const requestData = {
+      category: req.body.category,
+      title: req.body.title,
+      description: req.body.description,
+      budget: req.body.budget,
+      dateline: req.body.deadline,
+      location,
+      image: req.file?.path,
+    };
+
     const { request, offers } = await createRequest(userId, requestData);
     sendResponse(res, {
       statusCode: 201,

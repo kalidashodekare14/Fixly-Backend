@@ -1,11 +1,10 @@
 import Request from '../../models/request';
-import { IRequest } from '../../types/request';
+import { IRequest, IRequestClient } from '../../types/request';
 import Provider from '../../models/provider';
 import { dispatchRequest } from '../../utils/dispatchRequest';
 import Offer from '../../models/offer';
-import request from '../../models/request';
 
-const createRequest = async (userId: string, requestData: IRequest) => {
+const createRequest = async (userId: string, requestData: IRequestClient) => {
   // save data to database
   const request = await Request.create({ ...requestData, user: userId });
 
