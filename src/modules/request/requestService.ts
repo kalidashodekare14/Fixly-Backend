@@ -28,11 +28,7 @@ const createRequest = async (userId: string, requestData: IRequestClient) => {
 };
 
 const getRequest = async (userId: string) => {
-  const request = await Request.findOne({ user: userId }).populate(
-    'user',
-    'name email phone image',
-  );
-  console.log('Retrieved request:', request);
+  const request = await Request.find({ user: userId });
   return request;
 };
 

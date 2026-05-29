@@ -13,7 +13,7 @@ interface IRequest {
     postalCode: string;
     coordinates: number[];
   };
-  dateline: Date;
+  deadline: Date;
   status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled';
   image: string;
 }
@@ -30,7 +30,7 @@ interface IRequestClient {
     postalCode: string;
     coordinates: number[];
   };
-  dateline: string;
+  deadline: string;
   image?: string;
 }
 

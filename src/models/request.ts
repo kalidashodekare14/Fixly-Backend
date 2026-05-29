@@ -45,7 +45,7 @@ const requestSchema = new mongoose.Schema<IRequest>(
         default: [0, 0],
       },
     },
-    dateline: {
+    deadline: {
       type: Date,
     },
     status: {

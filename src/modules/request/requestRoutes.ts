@@ -20,7 +20,12 @@ router.post(
   createRequestController,
 );
 router.get('/', authMiddleware, getRequestController);
-router.put('/', authMiddleware, updateRequestController);
+router.put(
+  '/',
+  authMiddleware,
+  upload.single('image'),
+  updateRequestController,
+);
 router.delete('/', authMiddleware, deleteRequestController);
 router.get('/:requestId/offers', authMiddleware, getOffersForRequestController);
 router.put('/offers/:offerId/accept', authMiddleware, acceptOfferController);
