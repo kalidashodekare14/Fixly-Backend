@@ -10,8 +10,8 @@ export interface IUser extends Document {
   password: string;
   role: 'user' | 'provider' | 'admin';
   phone?: string;
-  address?: {
-    street?: string;
+  location?: {
+    address?: string;
     city?: string;
     state?: string;
     zipCode?: string;
@@ -60,8 +60,8 @@ const userSchema = new Schema<IUser>(
       type: String,
       trim: true,
     },
-    address: {
-      street: { type: String, trim: true },
+    location: {
+      address: { type: String, trim: true },
       city: { type: String, trim: true },
       state: { type: String, trim: true },
       zipCode: { type: String, trim: true },
