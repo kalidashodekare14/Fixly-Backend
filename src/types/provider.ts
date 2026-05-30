@@ -4,6 +4,7 @@ interface IProvider {
   services: string[];
   experience: number;
   skills: string[];
+  bio: string;
 
   location: {
     address: string;
@@ -16,7 +17,7 @@ interface IProvider {
 
   rating: number;
   reviews: string[];
-  availableStatus: 'available' | 'unavailable';
+  availableStatus?: boolean;
   rate: number;
   rateType: 'hourly' | 'fixed';
   isVerified: boolean;
@@ -31,15 +32,15 @@ interface IProviderUpdate {
   services?: string[];
   experience?: number;
   skills?: string[];
+  bio?: string;
 
   location?: {
     address: string;
     city: string;
     division: string;
-    postalCode: string;
   };
 
-  availableStatus?: 'available' | 'unavailable';
+  availableStatus?: boolean;
   rate?: number;
   rateType?: 'hourly' | 'fixed';
 }

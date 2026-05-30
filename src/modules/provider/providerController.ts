@@ -32,11 +32,25 @@ const providerInfoController = async (req: Request, res: Response) => {
 const providerInfoUpdateController = async (req: Request, res: Response) => {
   try {
     const userId = req.user.id;
-    const updateData = { ...req.body };
+
+    const parsedLocation = JSON.parse(req.body.location);
+
+    const location = {
+      ...parsedLocation,
+      coordinates: parsedLocation.coordinates.map(Number),
+    };
+
+    const updateData = {
+      ...req.body,
+      availableStatus: req.body.availableStatus === 'true',
+      location,
+    };
 
     if (req.file) {
       updateData.image = req.file.path;
     }
+
+    console.log(updateData);
 
     const providerData = await providerInfoUpdate(userId, updateData);
     sendResponse(res, {

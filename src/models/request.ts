@@ -8,6 +8,9 @@ const requestSchema = new mongoose.Schema<IRequest>(
       ref: 'User',
       required: true,
     },
+    image: {
+      type: String,
+    },
     title: {
       type: String,
       required: true,
@@ -37,16 +40,12 @@ const requestSchema = new mongoose.Schema<IRequest>(
       postalCode: {
         type: String,
       },
-      type: {
-        type: String,
-        default: 'Point',
-      },
       coordinates: {
         type: [Number],
         default: [0, 0],
       },
     },
-    dateline: {
+    deadline: {
       type: Date,
     },
     status: {

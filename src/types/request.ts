@@ -11,11 +11,27 @@ interface IRequest {
     city: string;
     division: string;
     postalCode: string;
-    type: string;
     coordinates: number[];
   };
-  dateline: Date;
+  deadline: Date;
   status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled';
+  image: string;
 }
 
-export { IRequest };
+interface IRequestClient {
+  title: string;
+  category: string;
+  description: string;
+  budget: number;
+  location: {
+    address: string;
+    city: string;
+    division: string;
+    postalCode: string;
+    coordinates: number[];
+  };
+  deadline: string;
+  image?: string;
+}
+
+export { IRequest, IRequestClient };

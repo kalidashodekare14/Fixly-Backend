@@ -11,6 +11,9 @@ const providerSchema = new mongoose.Schema<IProvider>(
     services: {
       type: [String],
     },
+    bio: {
+      type: String,
+    },
     experience: {
       type: Number,
     },
@@ -25,9 +28,6 @@ const providerSchema = new mongoose.Schema<IProvider>(
         type: String,
       },
       division: {
-        type: String,
-      },
-      postalCode: {
         type: String,
       },
       type: {
@@ -48,9 +48,8 @@ const providerSchema = new mongoose.Schema<IProvider>(
       default: [],
     },
     availableStatus: {
-      type: String,
-      enum: ['available', 'unavailable'],
-      default: 'available',
+      type: Boolean,
+      default: true,
     },
     rate: {
       type: Number,

@@ -1,11 +1,10 @@
 import Request from '../../models/request';
-import { IRequest } from '../../types/request';
+import { IRequest, IRequestClient } from '../../types/request';
 import Provider from '../../models/provider';
 import { dispatchRequest } from '../../utils/dispatchRequest';
 import Offer from '../../models/offer';
-import request from '../../models/request';
 
-const createRequest = async (userId: string, requestData: IRequest) => {
+const createRequest = async (userId: string, requestData: IRequestClient) => {
   // save data to database
   const request = await Request.create({ ...requestData, user: userId });
 
@@ -29,11 +28,7 @@ const createRequest = async (userId: string, requestData: IRequest) => {
 };
 
 const getRequest = async (userId: string) => {
-  const request = await Request.findOne({ user: userId }).populate(
-    'user',
-    'name email phone image',
-  );
-  console.log('Retrieved request:', request);
+  const request = await Request.find({ user: userId });
   return request;
 };
 

@@ -10,11 +10,22 @@ import {
   acceptOfferController,
 } from './requestController';
 import { authMiddleware } from '../../middlewares/authMiddleware';
+import { upload } from '../../config/multerStorage';
 
 // Define routes
-router.post('/', authMiddleware, createRequestController);
+router.post(
+  '/',
+  authMiddleware,
+  upload.single('image'),
+  createRequestController,
+);
 router.get('/', authMiddleware, getRequestController);
-router.put('/', authMiddleware, updateRequestController);
+router.put(
+  '/',
+  authMiddleware,
+  upload.single('image'),
+  updateRequestController,
+);
 router.delete('/', authMiddleware, deleteRequestController);
 router.get('/:requestId/offers', authMiddleware, getOffersForRequestController);
 router.put('/offers/:offerId/accept', authMiddleware, acceptOfferController);
