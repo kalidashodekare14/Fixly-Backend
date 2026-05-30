@@ -22,7 +22,7 @@ const providerInfo = async (providerId: string) => {
     .findOne({
       user: providerId,
     })
-    .populate('user', 'name email phone image');
+    .populate('user', 'name email phone image role');
 
   return providerData;
 };
@@ -35,39 +35,56 @@ const providerInfoUpdate = async (userId: string, data: IProviderUpdate) => {
   if (data.name) userData.name = data.name;
   if (data.email) userData.email = data.email;
   if (data.phone) userData.phone = data.phone;
+  if (data.image) userData.image = data.image;
 
   // ----------------------PROVIDER-----------------------
 
-  if (data.services !== undefined) providerData.services = data.services;
-  if (data.experience !== undefined) providerData.experience = data.experience;
-  if (data.skills !== undefined) providerData.skills = data.skills;
-  if (data.location !== undefined) providerData.location = data.location;
-  if (data.availableStatus !== undefined)
-    providerData.availableStatus = data.availableStatus;
-  if (data.rate !== undefined) providerData.rate = data.rate;
-  if (data.rateType !== undefined) providerData.rateType = data.rateType;
+  if (data.services) {
+    try {
+      providerData.services =
+        typeof data.services === 'string'
+          ? JSON.parse(data.services)
+          : data.services;
+    } catch {
+      providerData.services = [];
+    }
+  }
+  if (data.location) providerData.location = data.location;
 
-  // ----------------------IMAGE-----------------------
-  if (data.image !== undefined) {
-    userData.image = data.image;
+  if (data.bio) providerData.bio = data.bio;
+
+  if (typeof data.availableStatus === 'boolean') {
+    providerData.availableStatus = data.availableStatus;
   }
 
-  // User data to update
-  await user.findByIdAndUpdate(userId, userData, {
-    returnDocument: 'after',
-  });
-  // Provider data to update
-  const providerDataUpdate = await provider.findOneAndUpdate(
-    {
-      user: userId,
-    },
-    providerData,
-    {
-      returnDocument: 'after',
-    },
-  );
+  if (data.location) {
+    providerData.location = data.location;
+  }
 
-  return providerDataUpdate;
+  if (data.rate !== undefined) {
+    const rate = Number(data.rate);
+    if (!isNaN(rate)) providerData.rate = rate;
+  }
+
+  if (data.rateType) providerData.rateType = data.rateType;
+
+  // ---------------- UPDATE USER ----------------
+  if (Object.keys(userData).length > 0) {
+    await user.findByIdAndUpdate(userId, userData, { new: true });
+  }
+
+  // ---------------- UPDATE PROVIDER ----------------
+  let updatedProvider = null;
+
+  if (Object.keys(providerData).length > 0) {
+    updatedProvider = await provider.findOneAndUpdate(
+      { user: userId },
+      providerData,
+      { new: true },
+    );
+  }
+
+  return updatedProvider;
 };
 
 const requestInfo = async (userId: string) => {
