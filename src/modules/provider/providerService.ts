@@ -160,4 +160,37 @@ const offerCreate = async (userId: string, data: IOfferCreateData) => {
   return offer;
 };
 
-export { providerInfo, providerInfoUpdate, requestInfo, offerCreate };
+const offeredInfo = async (userId: string) => {
+  const providerData = await provider.findOne({ user: userId });
+
+  if (!providerData) {
+    throw new Error('Provider not found');
+  }
+
+  const offers = await Offer.find({
+    provider: providerData._id,
+    status: 'offered',
+  }).populate({
+    path: 'request',
+    populate: {
+      path: 'user',
+      select: 'name image',
+    },
+  });
+
+  // clean response (hide internal status if needed)
+  const cleanedOffers = offers.map((offer) => {
+    const { __v, ...rest } = offer.toObject();
+    return rest;
+  });
+
+  return cleanedOffers;
+};
+
+export {
+  providerInfo,
+  providerInfoUpdate,
+  requestInfo,
+  offerCreate,
+  offeredInfo,
+};

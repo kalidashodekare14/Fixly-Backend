@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import {
   offerCreate,
+  offeredInfo,
   providerInfo,
   providerInfoUpdate,
   requestInfo,
@@ -112,9 +113,31 @@ const offerCreateController = async (req: Request, res: Response) => {
   }
 };
 
+const sendOfferedInfoController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const offeredData = await offeredInfo(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: offeredData,
+      message: 'Request information retrieved successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Failed to retrieve request information',
+    });
+  }
+};
+
 export {
   providerInfoController,
   providerInfoUpdateController,
   requestInfoController,
   offerCreateController,
+  sendOfferedInfoController,
 };

@@ -70,14 +70,13 @@ const getOffersForRequest = async (requestId: string) => {
     path: 'provider',
     populate: {
       path: 'user',
-      select: 'name email phone image',
+      select: 'name role image',
     },
   });
 
   if (!offers) {
     throw new Error('Request not found');
   }
-  console.log('Offers for request:', offers);
   return offers;
 };
 
