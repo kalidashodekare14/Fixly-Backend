@@ -4,7 +4,9 @@ import {
   offeredInfo,
   providerInfo,
   providerInfoUpdate,
+  providerJobsInfo,
   requestInfo,
+  jobStatusChange,
 } from './providerService';
 import sendResponse from '../../utils/sendResponse';
 
@@ -134,10 +136,55 @@ const sendOfferedInfoController = async (req: Request, res: Response) => {
   }
 };
 
+const providerJobsInfoController = async (req: Request, res: Response) => {
+  try {
+    const providerId = req.user.id;
+    const providerData = await providerJobsInfo(providerId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: providerData,
+      message: 'Provider Jobs information successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Failed to provider jobs information',
+    });
+  }
+};
+
+const jobsStatusChangeController = async (req: Request, res: Response) => {
+  try {
+    const providerId = req.user.id;
+    const jobData = req.body;
+    const providerData = await jobStatusChange(providerId, jobData);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: providerData,
+      message: 'Job status change successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Job status change failed',
+    });
+  }
+};
+
 export {
   providerInfoController,
   providerInfoUpdateController,
   requestInfoController,
   offerCreateController,
   sendOfferedInfoController,
+  providerJobsInfoController,
+  jobsStatusChangeController,
 };
