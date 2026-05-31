@@ -96,7 +96,14 @@ const requestInfo = async (userId: string) => {
 
   const offers = await Offer.find({
     provider: providerData._id,
-  }).populate('request');
+    status: 'pending',
+  }).populate({
+    path: 'request',
+    populate: {
+      path: 'user',
+      select: 'name image',
+    },
+  });
 
   // clean response (hide internal status if needed)
   const cleanedOffers = offers.map((offer) => {
