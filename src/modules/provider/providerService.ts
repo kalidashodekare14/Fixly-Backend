@@ -158,6 +158,9 @@ const offerCreate = async (userId: string, data: IOfferCreateData) => {
       new: true,
     },
   );
+
+  await Request.findByIdAndUpdate(data.requestId, { status: 'open' });
+
   return offer;
 };
 

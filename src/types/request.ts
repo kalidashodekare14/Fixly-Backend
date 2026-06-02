@@ -14,7 +14,13 @@ interface IRequest {
     coordinates: number[];
   };
   deadline: Date;
-  status: 'pending' | 'assigned' | 'in_progress' | 'completed' | 'cancelled';
+  status:
+    | 'pending'
+    | 'open'
+    | 'assigned'
+    | 'in_progress'
+    | 'completed'
+    | 'cancelled';
   image: string;
 }
 

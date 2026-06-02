@@ -5,6 +5,9 @@ import {
   deleteRequest,
   getOffersForRequest,
   acceptOffer,
+  acceptedOffers,
+  viewOpenRequest,
+  viewSelectedOfferForRequest,
 } from './requestService';
 import { Request, Response } from 'express';
 import sendResponse from '../../utils/sendResponse';
@@ -57,6 +60,30 @@ const getRequestController = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error retrieving request:', error);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
+const viewSelectedOfferForRequestController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const userId = req.user.id;
+    const request = await viewSelectedOfferForRequest(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Request with selected offer retrieved successfully',
+      data: request,
+    });
+  } catch (error) {
+    console.error('Error retrieving request with selected offer:', error);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -123,6 +150,27 @@ const deleteRequestController = async (req: Request, res: Response) => {
   }
 };
 
+const viewOpenRequestController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const request = await viewOpenRequest(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Open requests retrieved successfully',
+      data: request,
+    });
+  } catch (error) {
+    console.error('Error retrieving open requests:', error);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
 const getOffersForRequestController = async (req: Request, res: Response) => {
   try {
     const requestId = req.params.requestId.toString();
@@ -135,6 +183,27 @@ const getOffersForRequestController = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Error fetching offers:', error);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
+const getAcceptedOffersController = async (req: Request, res: Response) => {
+  try {
+    const requestId = req.params.requestId.toString();
+    const offers = await acceptedOffers(requestId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Accepted offers fetched successfully',
+      data: offers,
+    });
+  } catch (error) {
+    console.error('Error fetching accepted offers:', error);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -173,4 +242,7 @@ export {
   deleteRequestController,
   getOffersForRequestController,
   acceptOfferController,
+  getAcceptedOffersController,
+  viewOpenRequestController,
+  viewSelectedOfferForRequestController,
 };
