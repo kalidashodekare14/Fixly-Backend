@@ -63,4 +63,16 @@ const publicService = async (data: any) => {
   };
 };
 
-export { publicService };
+const providerPublicProfile = async (providerId: string) => {
+  const provider = await Provider.findById(providerId)
+    .select(
+      'bio services rating location rating rate rateType experience availableStatus',
+    )
+    .populate('user', 'name image email phone');
+  if (!provider) {
+    throw new Error('Provider not found');
+  }
+  return provider;
+};
+
+export { publicService, providerPublicProfile };
