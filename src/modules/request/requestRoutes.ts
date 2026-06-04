@@ -8,6 +8,9 @@ import {
   deleteRequestController,
   getOffersForRequestController,
   acceptOfferController,
+  getAcceptedOffersController,
+  viewOpenRequestController,
+  viewSelectedOfferForRequestController,
 } from './requestController';
 import { authMiddleware } from '../../middlewares/authMiddleware';
 import { upload } from '../../config/multerStorage';
@@ -27,6 +30,16 @@ router.put(
   updateRequestController,
 );
 router.delete('/', authMiddleware, deleteRequestController);
+
+router.get('/open_requests', authMiddleware, viewOpenRequestController);
+router.get(
+  '/selected_offer',
+  authMiddleware,
+  viewSelectedOfferForRequestController,
+);
+
+// accept offer and get offers for request
+router.get('/:requestId/accepted', authMiddleware, getAcceptedOffersController);
 router.get('/:requestId/offers', authMiddleware, getOffersForRequestController);
 router.put('/offers/:offerId/accept', authMiddleware, acceptOfferController);
 

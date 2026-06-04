@@ -50,7 +50,14 @@ const requestSchema = new mongoose.Schema<IRequest>(
     },
     status: {
       type: String,
-      enum: ['pending', 'assigned', 'in_progress', 'completed', 'cancelled'],
+      enum: [
+        'pending',
+        'open',
+        'assigned',
+        'in_progress',
+        'completed',
+        'cancelled',
+      ],
       default: 'pending',
     },
   },

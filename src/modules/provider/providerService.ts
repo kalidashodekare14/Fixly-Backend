@@ -2,6 +2,7 @@ import provider from '../../models/provider';
 import { IProviderUpdate } from '../../types/provider';
 import user from '../../models/user';
 import Offer from '../../models/offer';
+import Request from '../../models/request';
 
 interface IUserData {
   image?: string;
@@ -96,7 +97,14 @@ const requestInfo = async (userId: string) => {
 
   const offers = await Offer.find({
     provider: providerData._id,
-  }).populate('request');
+    status: 'pending',
+  }).populate({
+    path: 'request',
+    populate: {
+      path: 'user',
+      select: 'name image',
+    },
+  });
 
   // clean response (hide internal status if needed)
   const cleanedOffers = offers.map((offer) => {
@@ -150,7 +158,101 @@ const offerCreate = async (userId: string, data: IOfferCreateData) => {
       new: true,
     },
   );
+
+  await Request.findByIdAndUpdate(data.requestId, { status: 'open' });
+
   return offer;
 };
 
-export { providerInfo, providerInfoUpdate, requestInfo, offerCreate };
+const offeredInfo = async (userId: string) => {
+  const providerData = await provider.findOne({ user: userId });
+
+  if (!providerData) {
+    throw new Error('Provider not found');
+  }
+
+  const offers = await Offer.find({
+    provider: providerData._id,
+    status: 'offered',
+  }).populate({
+    path: 'request',
+    populate: {
+      path: 'user',
+      select: 'name image',
+    },
+  });
+
+  // clean response (hide internal status if needed)
+  const cleanedOffers = offers.map((offer) => {
+    const { __v, ...rest } = offer.toObject();
+    return rest;
+  });
+
+  return cleanedOffers;
+};
+
+const providerJobsInfo = async (userId: string) => {
+  const providerData = await provider.findOne({ user: userId });
+
+  if (!providerData) {
+    throw new Error('Provider not found');
+  }
+
+  const jobsData = await Offer.find({
+    provider: providerData._id,
+    status: 'accepted',
+  }).populate({
+    path: 'request',
+    populate: {
+      path: 'user',
+      select: 'name image',
+    },
+  });
+
+  // clean response (hide internal status if needed)
+  const cleanedJobs = jobsData.map((offer) => {
+    const { __v, ...rest } = offer.toObject();
+    return rest;
+  });
+
+  return cleanedJobs;
+};
+
+const jobStatusChange = async (userId: string, data: any) => {
+  const providerData = await provider.findOne({ user: userId });
+
+  if (!providerData) {
+    throw new Error('Provider not found');
+  }
+
+  const jobsData = await Offer.findOne({
+    _id: data.jobId,
+    provider: providerData._id,
+    status: 'accepted',
+  }).populate('request');
+
+  if (!jobsData) {
+    throw new Error('Job not found');
+  }
+
+  await Request.findByIdAndUpdate(
+    jobsData.request._id,
+    {
+      status: data.status,
+    },
+    {
+      returnDocument: 'after',
+      runValidators: true,
+    },
+  );
+};
+
+export {
+  providerInfo,
+  providerInfoUpdate,
+  requestInfo,
+  offerCreate,
+  offeredInfo,
+  providerJobsInfo,
+  jobStatusChange,
+};

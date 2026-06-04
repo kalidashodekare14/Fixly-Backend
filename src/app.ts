@@ -7,6 +7,7 @@ import authRoutes from './modules/auth/authRoutes';
 import userRoutes from './modules/user/userRoutes';
 import providerRoutes from './modules/provider/providerRoutes';
 import requestRoutes from './modules/request/requestRoutes';
+import publicRoutes from './modules/public/publicRoutes';
 
 // Initialize Express app
 const app = express();
@@ -24,6 +25,7 @@ app.get('/', (_req: Request, res: Response) => {
 });
 
 // Routes
+app.use('/api/public', publicRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/provider', providerRoutes);

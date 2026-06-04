@@ -28,7 +28,9 @@ const createRequest = async (userId: string, requestData: IRequestClient) => {
 };
 
 const getRequest = async (userId: string) => {
-  const request = await Request.find({ user: userId });
+  const request = await Request.find({
+    user: userId,
+  });
   return request;
 };
 
@@ -62,6 +64,22 @@ const deleteRequest = async (userId: string) => {
   return deletedRequest;
 };
 
+const viewOpenRequest = async (userId: string) => {
+  const request = await Request.find({
+    user: userId,
+    status: 'open',
+  });
+  return request;
+};
+
+const viewSelectedOfferForRequest = async (userId: string) => {
+  const request = await Request.find({
+    user: userId,
+    status: { $in: ['assigned', 'in_progress', 'completed'] },
+  });
+  return request;
+};
+
 const getOffersForRequest = async (requestId: string) => {
   const offers = await Offer.find({
     request: requestId,
@@ -70,14 +88,31 @@ const getOffersForRequest = async (requestId: string) => {
     path: 'provider',
     populate: {
       path: 'user',
-      select: 'name email phone image',
+      select: 'name role image',
     },
   });
 
   if (!offers) {
     throw new Error('Request not found');
   }
-  console.log('Offers for request:', offers);
+  return offers;
+};
+
+const acceptedOffers = async (requestId: string) => {
+  const offers = await Offer.find({
+    request: requestId,
+    status: { $in: ['accepted'] },
+  }).populate({
+    path: 'provider',
+    populate: {
+      path: 'user',
+      select: 'name role image',
+    },
+  });
+
+  if (!offers) {
+    throw new Error('Request not found');
+  }
   return offers;
 };
 
@@ -119,6 +154,9 @@ export {
   getRequest,
   requestUpdate,
   deleteRequest,
+  viewOpenRequest,
   getOffersForRequest,
+  acceptedOffers,
   acceptOffer,
+  viewSelectedOfferForRequest,
 };

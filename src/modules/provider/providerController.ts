@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import {
   offerCreate,
+  offeredInfo,
   providerInfo,
   providerInfoUpdate,
+  providerJobsInfo,
   requestInfo,
+  jobStatusChange,
 } from './providerService';
 import sendResponse from '../../utils/sendResponse';
 
@@ -112,9 +115,76 @@ const offerCreateController = async (req: Request, res: Response) => {
   }
 };
 
+const sendOfferedInfoController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const offeredData = await offeredInfo(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: offeredData,
+      message: 'Request information retrieved successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Failed to retrieve request information',
+    });
+  }
+};
+
+const providerJobsInfoController = async (req: Request, res: Response) => {
+  try {
+    const providerId = req.user.id;
+    const providerData = await providerJobsInfo(providerId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: providerData,
+      message: 'Provider Jobs information successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Failed to provider jobs information',
+    });
+  }
+};
+
+const jobsStatusChangeController = async (req: Request, res: Response) => {
+  try {
+    const providerId = req.user.id;
+    const jobData = req.body;
+    const providerData = await jobStatusChange(providerId, jobData);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: providerData,
+      message: 'Job status change successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Job status change failed',
+    });
+  }
+};
+
 export {
   providerInfoController,
   providerInfoUpdateController,
   requestInfoController,
   offerCreateController,
+  sendOfferedInfoController,
+  providerJobsInfoController,
+  jobsStatusChangeController,
 };
