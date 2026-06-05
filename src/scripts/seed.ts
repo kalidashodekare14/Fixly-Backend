@@ -63,6 +63,7 @@ async function seed() {
       email: `provider${i + 1}@fixly.com`,
       password: hashedPassword,
       role: 'provider',
+      image: faker.image.avatar(),
       phone: faker.phone.number(),
       location: {
         address: faker.location.streetAddress(),
@@ -80,6 +81,7 @@ async function seed() {
       email: `user${i + 1}@fixly.com`,
       password: hashedPassword,
       role: 'user',
+      image: faker.image.avatar(),
       phone: faker.phone.number(),
       location: {
         address: faker.location.streetAddress(),

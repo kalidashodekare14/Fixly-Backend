@@ -100,10 +100,16 @@ const requestInfo = async (userId: string) => {
     status: 'pending',
   }).populate({
     path: 'request',
-    populate: {
-      path: 'user',
-      select: 'name image',
-    },
+    populate: [
+      {
+        path: 'user',
+        select: 'name image',
+      },
+      {
+        path: 'category',
+        select: 'label',
+      },
+    ],
   });
 
   // clean response (hide internal status if needed)
@@ -176,10 +182,16 @@ const offeredInfo = async (userId: string) => {
     status: 'offered',
   }).populate({
     path: 'request',
-    populate: {
-      path: 'user',
-      select: 'name image',
-    },
+    populate: [
+      {
+        path: 'user',
+        select: 'name image',
+      },
+      {
+        path: 'category',
+        select: 'label',
+      },
+    ],
   });
 
   // clean response (hide internal status if needed)
@@ -203,10 +215,16 @@ const providerJobsInfo = async (userId: string) => {
     status: 'accepted',
   }).populate({
     path: 'request',
-    populate: {
-      path: 'user',
-      select: 'name image',
-    },
+    populate: [
+      {
+        path: 'user',
+        select: 'name image',
+      },
+      {
+        path: 'category',
+        select: 'label',
+      },
+    ],
   });
 
   // clean response (hide internal status if needed)
