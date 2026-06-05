@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 interface IRequest {
   user: mongoose.Types.ObjectId;
   title: string;
-  category: string;
+  category: mongoose.Types.ObjectId;
   description: string;
   budget: number;
   location: {

@@ -6,6 +6,7 @@ import Offer from '../../models/offer';
 
 const createRequest = async (userId: string, requestData: IRequestClient) => {
   // save data to database
+  console.log('checking category', requestData.category);
   const request = await Request.create({ ...requestData, user: userId });
 
   // find nearby providers based on location
@@ -30,7 +31,7 @@ const createRequest = async (userId: string, requestData: IRequestClient) => {
 const getRequest = async (userId: string) => {
   const request = await Request.find({
     user: userId,
-  });
+  }).populate('category', 'label');
   return request;
 };
 
