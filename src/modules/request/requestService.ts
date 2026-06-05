@@ -69,7 +69,7 @@ const viewOpenRequest = async (userId: string) => {
   const request = await Request.find({
     user: userId,
     status: 'open',
-  });
+  }).populate('category', 'label');
   return request;
 };
 
@@ -77,7 +77,7 @@ const viewSelectedOfferForRequest = async (userId: string) => {
   const request = await Request.find({
     user: userId,
     status: { $in: ['assigned', 'in_progress', 'completed'] },
-  });
+  }).populate('category', 'label');
   return request;
 };
 
