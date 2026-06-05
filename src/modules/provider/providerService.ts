@@ -210,22 +210,19 @@ const providerJobsInfo = async (userId: string) => {
     throw new Error('Provider not found');
   }
 
-  const jobsData = await Offer.find({
+  const jobsData = await Request.find({
     provider: providerData._id,
-    status: 'accepted',
-  }).populate({
-    path: 'request',
-    populate: [
-      {
-        path: 'user',
-        select: 'name image',
-      },
-      {
-        path: 'category',
-        select: 'label',
-      },
-    ],
-  });
+    status: { $in: ['assigned', 'in_progress', 'completed'] },
+  }).populate([
+    {
+      path: 'user',
+      select: 'name image',
+    },
+    {
+      path: 'category',
+      select: 'label',
+    },
+  ]);
 
   // clean response (hide internal status if needed)
   const cleanedJobs = jobsData.map((offer) => {
@@ -244,7 +241,7 @@ const jobStatusChange = async (userId: string, data: any) => {
   }
 
   const jobsData = await Offer.findOne({
-    _id: data.jobId,
+    // _id: data.jobId,
     provider: providerData._id,
     status: 'accepted',
   }).populate('request');

@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 interface IRequest {
   user: mongoose.Types.ObjectId;
+  provider: mongoose.Types.ObjectId;
   title: string;
   category: mongoose.Types.ObjectId;
   description: string;

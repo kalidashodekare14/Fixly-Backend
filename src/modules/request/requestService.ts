@@ -6,8 +6,10 @@ import Offer from '../../models/offer';
 
 const createRequest = async (userId: string, requestData: IRequestClient) => {
   // save data to database
-  console.log('checking category', requestData.category);
-  const request = await Request.create({ ...requestData, user: userId });
+  const request = await Request.create({
+    ...requestData,
+    user: userId,
+  });
 
   // find nearby providers based on location
   const nearbyProviders = await Provider.find({
@@ -145,7 +147,10 @@ const acceptOffer = async (userId: string, offerId: string) => {
   // request status update
   await Request.findByIdAndUpdate(
     offer.request,
-    { status: 'assigned' },
+    {
+      status: 'assigned',
+      provider: offer.provider,
+    },
     { returnDocument: 'after' },
   );
 };

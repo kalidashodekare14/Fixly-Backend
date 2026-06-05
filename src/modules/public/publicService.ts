@@ -91,9 +91,10 @@ const publicService = async (data: any) => {
 const providerPublicProfile = async (providerId: string) => {
   const provider = await Provider.findById(providerId)
     .select(
-      'bio services rating location rating rate rateType experience availableStatus',
+      'bio rating location rating rate rateType experience availableStatus',
     )
-    .populate('user', 'name image email phone');
+    .populate('user', 'name image email phone')
+    .populate('skills', 'label');
   if (!provider) {
     throw new Error('Provider not found');
   }
