@@ -3,6 +3,7 @@ import { IProviderUpdate } from '../../types/provider';
 import user from '../../models/user';
 import Offer from '../../models/offer';
 import Request from '../../models/request';
+import { populate } from 'dotenv';
 
 interface IUserData {
   image?: string;
@@ -23,7 +24,8 @@ const providerInfo = async (providerId: string) => {
     .findOne({
       user: providerId,
     })
-    .populate('user', 'name email phone image role');
+    .populate('user', 'name email phone image role')
+    .populate('skills', 'label');
 
   return providerData;
 };
@@ -40,14 +42,12 @@ const providerInfoUpdate = async (userId: string, data: IProviderUpdate) => {
 
   // ----------------------PROVIDER-----------------------
 
-  if (data.services) {
+  if (data.skills) {
     try {
-      providerData.services =
-        typeof data.services === 'string'
-          ? JSON.parse(data.services)
-          : data.services;
+      providerData.skills =
+        typeof data.skills === 'string' ? JSON.parse(data.skills) : data.skills;
     } catch {
-      providerData.services = [];
+      providerData.skills = [];
     }
   }
   if (data.location) providerData.location = data.location;
