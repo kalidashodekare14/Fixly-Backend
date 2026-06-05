@@ -1,4 +1,5 @@
 import Provider from '../../models/provider';
+import Category from '../../models/category';
 
 const publicService = async (data: any) => {
   const {
@@ -75,4 +76,10 @@ const providerPublicProfile = async (providerId: string) => {
   return provider;
 };
 
-export { publicService, providerPublicProfile };
+const getCategories = async () => {
+  const categories = await Category.find();
+
+  return categories;
+};
+
+export { publicService, providerPublicProfile, getCategories };

@@ -8,6 +8,7 @@ import userRoutes from './modules/user/userRoutes';
 import providerRoutes from './modules/provider/providerRoutes';
 import requestRoutes from './modules/request/requestRoutes';
 import publicRoutes from './modules/public/publicRoutes';
+import adminRoutes from './modules/admin/adminRoutes';
 
 // Initialize Express app
 const app = express();
@@ -30,6 +31,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/provider', providerRoutes);
 app.use('/api/request', requestRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Global error handler
 app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
