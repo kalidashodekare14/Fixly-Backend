@@ -15,7 +15,7 @@ const createRequest = async (userId: string, requestData: IRequestClient) => {
     status: requestData.requestType === 'direct' ? 'assigned' : 'pending',
   });
 
-  if (requestData.requestType === 'direc') {
+  if (requestData.requestType === 'direct') {
     return { request, offer: [] };
   }
 
@@ -109,10 +109,10 @@ const getOffersForRequest = async (requestId: string) => {
   return offers;
 };
 
-const acceptedOffers = async (requestId: string) => {
-  const offers = await Offer.find({
-    request: requestId,
-    status: { $in: ['accepted'] },
+const selectedProvider = async (requestId: string) => {
+  const request = await Request.findOne({
+    _id: requestId,
+    status: { $in: ['assigned', 'in_progress', 'completed'] },
   }).populate({
     path: 'provider',
     populate: {
@@ -121,10 +121,12 @@ const acceptedOffers = async (requestId: string) => {
     },
   });
 
-  if (!offers) {
-    throw new Error('Request not found');
-  }
-  return offers;
+  const offer = await Offer.findOne({
+    request: requestId,
+    status: 'accepted',
+  });
+
+  return { request, offer: offer };
 };
 
 const acceptOffer = async (userId: string, offerId: string) => {
@@ -170,7 +172,7 @@ export {
   deleteRequest,
   viewOpenRequest,
   getOffersForRequest,
-  acceptedOffers,
+  selectedProvider,
   acceptOffer,
   viewSelectedOfferForRequest,
 };

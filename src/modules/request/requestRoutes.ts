@@ -8,7 +8,7 @@ import {
   deleteRequestController,
   getOffersForRequestController,
   acceptOfferController,
-  getAcceptedOffersController,
+  getSelectedProviderController,
   viewOpenRequestController,
   viewSelectedOfferForRequestController,
 } from './requestController';
@@ -39,7 +39,11 @@ router.get(
 );
 
 // accept offer and get offers for request
-router.get('/:requestId/accepted', authMiddleware, getAcceptedOffersController);
+router.get(
+  '/:requestId/selected_provider',
+  authMiddleware,
+  getSelectedProviderController,
+);
 router.get('/:requestId/offers', authMiddleware, getOffersForRequestController);
 router.put('/offers/:offerId/accept', authMiddleware, acceptOfferController);
 

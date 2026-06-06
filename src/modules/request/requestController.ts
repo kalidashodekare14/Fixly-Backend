@@ -5,7 +5,7 @@ import {
   deleteRequest,
   getOffersForRequest,
   acceptOffer,
-  acceptedOffers,
+  selectedProvider,
   viewOpenRequest,
   viewSelectedOfferForRequest,
 } from './requestService';
@@ -196,10 +196,10 @@ const getOffersForRequestController = async (req: Request, res: Response) => {
   }
 };
 
-const getAcceptedOffersController = async (req: Request, res: Response) => {
+const getSelectedProviderController = async (req: Request, res: Response) => {
   try {
     const requestId = req.params.requestId.toString();
-    const offers = await acceptedOffers(requestId);
+    const offers = await selectedProvider(requestId);
     sendResponse(res, {
       statusCode: 200,
       success: true,
@@ -246,7 +246,7 @@ export {
   deleteRequestController,
   getOffersForRequestController,
   acceptOfferController,
-  getAcceptedOffersController,
+  getSelectedProviderController,
   viewOpenRequestController,
   viewSelectedOfferForRequestController,
 };
