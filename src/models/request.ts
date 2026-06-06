@@ -8,6 +8,11 @@ const requestSchema = new mongoose.Schema<IRequest>(
       ref: 'User',
       required: true,
     },
+    provider: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Provider',
+      default: null,
+    },
     image: {
       type: String,
     },
@@ -16,7 +21,8 @@ const requestSchema = new mongoose.Schema<IRequest>(
       required: true,
     },
     category: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Category',
       required: true,
     },
     description: {

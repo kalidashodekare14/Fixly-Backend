@@ -2,8 +2,9 @@ import mongoose from 'mongoose';
 
 interface IRequest {
   user: mongoose.Types.ObjectId;
+  provider: mongoose.Types.ObjectId;
   title: string;
-  category: string;
+  category: mongoose.Types.ObjectId;
   description: string;
   budget: number;
   location: {
@@ -38,6 +39,8 @@ interface IRequestClient {
   };
   deadline: string;
   image?: string;
+  providerId: string;
+  requestType: string;
 }
 
 export { IRequest, IRequestClient };

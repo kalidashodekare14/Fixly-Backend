@@ -4,21 +4,9 @@ import { faker } from '@faker-js/faker';
 
 import User from '../models/user';
 import Provider from '../models/provider';
+import Category from '../models/category';
 
 const MONGO_URI = 'mongodb://localhost:27017/fixly';
-
-const services = [
-  'Electrical Repair',
-  'Plumbing',
-  'AC Repair',
-  'Painting',
-  'Carpentry',
-  'Cleaning',
-  'Gardening',
-  'CCTV Installation',
-  'Computer Repair',
-  'Mobile Repair',
-];
 
 const cities = [
   'Dhaka',
@@ -43,7 +31,18 @@ async function seed() {
     const hashedPassword = await bcrypt.hash('123456', 10);
 
     // =========================
-    // STEP 1: CREATE IDS
+    // STEP 1: GET EXISTING CATEGORIES
+    // =========================
+    const categories = await Category.find({});
+
+    if (!categories.length) {
+      throw new Error('❌ No categories found. Please seed categories first.');
+    }
+
+    console.log('📦 Categories loaded:', categories.length);
+
+    // =========================
+    // STEP 2: CREATE USER IDS
     // =========================
     const providerUserIds = Array.from(
       { length: 20 },
@@ -56,7 +55,7 @@ async function seed() {
     );
 
     // =========================
-    // STEP 2: USERS
+    // STEP 3: USERS
     // =========================
     const providerUsers = providerUserIds.map((id, i) => ({
       _id: id,
@@ -64,6 +63,7 @@ async function seed() {
       email: `provider${i + 1}@fixly.com`,
       password: hashedPassword,
       role: 'provider',
+      image: faker.image.avatar(),
       phone: faker.phone.number(),
       location: {
         address: faker.location.streetAddress(),
@@ -81,6 +81,7 @@ async function seed() {
       email: `user${i + 1}@fixly.com`,
       password: hashedPassword,
       role: 'user',
+      image: faker.image.avatar(),
       phone: faker.phone.number(),
       location: {
         address: faker.location.streetAddress(),
@@ -96,32 +97,35 @@ async function seed() {
     console.log('👤 Users inserted');
 
     // =========================
-    // STEP 3: PROVIDERS
+    // STEP 4: PROVIDERS
     // =========================
     const providers = providerUserIds.map((id) => ({
       user: id,
-      services: faker.helpers.arrayElements(services, 2),
+
+      // ✅ using existing category IDs
+      skills: faker.helpers.arrayElements(
+        categories.map((c) => c._id),
+        2,
+      ),
+
       bio: faker.person.bio(),
       experience: faker.number.int({ min: 1, max: 15 }),
-      skills: faker.helpers.arrayElements(
-        ['Wiring', 'Repair', 'Installation', 'Maintenance', 'Troubleshooting'],
-        3,
-      ),
 
       location: {
         address: faker.location.streetAddress(),
         city: faker.helpers.arrayElement(cities),
         division: faker.helpers.arrayElement(cities),
-
-        // IMPORTANT: keep schema compatible
         type: 'Point',
-
         coordinates: [faker.location.longitude(), faker.location.latitude()],
       },
 
-      rating: faker.number.float({ min: 3.5, max: 5, fractionDigits: 1 }),
+      rating: faker.number.float({
+        min: 3.5,
+        max: 5,
+        fractionDigits: 1,
+      }),
 
-      reviews: ['Good service', 'Recommended'],
+      reviews: faker.number.int({ min: 0, max: 200 }),
 
       availableStatus: faker.datatype.boolean(),
 

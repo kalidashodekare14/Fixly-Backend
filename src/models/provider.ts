@@ -8,18 +8,18 @@ const providerSchema = new mongoose.Schema<IProvider>(
       ref: 'User',
       required: true,
     },
-    services: {
-      type: [String],
-    },
     bio: {
       type: String,
     },
     experience: {
       type: Number,
     },
-    skills: {
-      type: [String],
-    },
+    skills: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+      },
+    ],
     location: {
       address: {
         type: String,
@@ -44,8 +44,8 @@ const providerSchema = new mongoose.Schema<IProvider>(
       default: 0,
     },
     reviews: {
-      type: [String],
-      default: [],
+      type: Number,
+      default: 0,
     },
     availableStatus: {
       type: Boolean,

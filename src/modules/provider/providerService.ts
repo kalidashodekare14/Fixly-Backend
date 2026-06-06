@@ -3,6 +3,7 @@ import { IProviderUpdate } from '../../types/provider';
 import user from '../../models/user';
 import Offer from '../../models/offer';
 import Request from '../../models/request';
+import { populate } from 'dotenv';
 
 interface IUserData {
   image?: string;
@@ -23,7 +24,8 @@ const providerInfo = async (providerId: string) => {
     .findOne({
       user: providerId,
     })
-    .populate('user', 'name email phone image role');
+    .populate('user', 'name email phone image role')
+    .populate('skills', 'label');
 
   return providerData;
 };
@@ -40,14 +42,12 @@ const providerInfoUpdate = async (userId: string, data: IProviderUpdate) => {
 
   // ----------------------PROVIDER-----------------------
 
-  if (data.services) {
+  if (data.skills) {
     try {
-      providerData.services =
-        typeof data.services === 'string'
-          ? JSON.parse(data.services)
-          : data.services;
+      providerData.skills =
+        typeof data.skills === 'string' ? JSON.parse(data.skills) : data.skills;
     } catch {
-      providerData.services = [];
+      providerData.skills = [];
     }
   }
   if (data.location) providerData.location = data.location;
@@ -100,10 +100,16 @@ const requestInfo = async (userId: string) => {
     status: 'pending',
   }).populate({
     path: 'request',
-    populate: {
-      path: 'user',
-      select: 'name image',
-    },
+    populate: [
+      {
+        path: 'user',
+        select: 'name image',
+      },
+      {
+        path: 'category',
+        select: 'label',
+      },
+    ],
   });
 
   // clean response (hide internal status if needed)
@@ -176,10 +182,16 @@ const offeredInfo = async (userId: string) => {
     status: 'offered',
   }).populate({
     path: 'request',
-    populate: {
-      path: 'user',
-      select: 'name image',
-    },
+    populate: [
+      {
+        path: 'user',
+        select: 'name image',
+      },
+      {
+        path: 'category',
+        select: 'label',
+      },
+    ],
   });
 
   // clean response (hide internal status if needed)
@@ -198,16 +210,19 @@ const providerJobsInfo = async (userId: string) => {
     throw new Error('Provider not found');
   }
 
-  const jobsData = await Offer.find({
+  const jobsData = await Request.find({
     provider: providerData._id,
-    status: 'accepted',
-  }).populate({
-    path: 'request',
-    populate: {
+    status: { $in: ['assigned', 'in_progress', 'completed'] },
+  }).populate([
+    {
       path: 'user',
       select: 'name image',
     },
-  });
+    {
+      path: 'category',
+      select: 'label',
+    },
+  ]);
 
   // clean response (hide internal status if needed)
   const cleanedJobs = jobsData.map((offer) => {
@@ -226,7 +241,7 @@ const jobStatusChange = async (userId: string, data: any) => {
   }
 
   const jobsData = await Offer.findOne({
-    _id: data.jobId,
+    // _id: data.jobId,
     provider: providerData._id,
     status: 'accepted',
   }).populate('request');

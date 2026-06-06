@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 interface IProvider {
   user: mongoose.Types.ObjectId;
-  services: string[];
+  services: [mongoose.Types.ObjectId];
   experience: number;
-  skills: string[];
+  skills: mongoose.Types.ObjectId[];
   bio: string;
 
   location: {
@@ -16,7 +16,7 @@ interface IProvider {
   };
 
   rating: number;
-  reviews: string[];
+  reviews: number;
   availableStatus?: boolean;
   rate: number;
   rateType: 'hourly' | 'fixed';

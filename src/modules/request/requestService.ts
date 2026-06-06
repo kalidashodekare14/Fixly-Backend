@@ -6,7 +6,18 @@ import Offer from '../../models/offer';
 
 const createRequest = async (userId: string, requestData: IRequestClient) => {
   // save data to database
-  const request = await Request.create({ ...requestData, user: userId });
+  const request = await Request.create({
+    ...requestData,
+    user: userId,
+    ...(requestData.requestType === 'direct' && {
+      provider: requestData.providerId,
+    }),
+    status: requestData.requestType === 'direct' ? 'assigned' : 'pending',
+  });
+
+  if (requestData.requestType === 'direct') {
+    return { request, offer: [] };
+  }
 
   // find nearby providers based on location
   const nearbyProviders = await Provider.find({
@@ -30,7 +41,7 @@ const createRequest = async (userId: string, requestData: IRequestClient) => {
 const getRequest = async (userId: string) => {
   const request = await Request.find({
     user: userId,
-  });
+  }).populate('category', 'label');
   return request;
 };
 
@@ -68,7 +79,7 @@ const viewOpenRequest = async (userId: string) => {
   const request = await Request.find({
     user: userId,
     status: 'open',
-  });
+  }).populate('category', 'label');
   return request;
 };
 
@@ -76,7 +87,7 @@ const viewSelectedOfferForRequest = async (userId: string) => {
   const request = await Request.find({
     user: userId,
     status: { $in: ['assigned', 'in_progress', 'completed'] },
-  });
+  }).populate('category', 'label');
   return request;
 };
 
@@ -98,10 +109,10 @@ const getOffersForRequest = async (requestId: string) => {
   return offers;
 };
 
-const acceptedOffers = async (requestId: string) => {
-  const offers = await Offer.find({
-    request: requestId,
-    status: { $in: ['accepted'] },
+const selectedProvider = async (requestId: string) => {
+  const request = await Request.findOne({
+    _id: requestId,
+    status: { $in: ['assigned', 'in_progress', 'completed'] },
   }).populate({
     path: 'provider',
     populate: {
@@ -110,10 +121,12 @@ const acceptedOffers = async (requestId: string) => {
     },
   });
 
-  if (!offers) {
-    throw new Error('Request not found');
-  }
-  return offers;
+  const offer = await Offer.findOne({
+    request: requestId,
+    status: 'accepted',
+  });
+
+  return { request, offer: offer };
 };
 
 const acceptOffer = async (userId: string, offerId: string) => {
@@ -144,7 +157,10 @@ const acceptOffer = async (userId: string, offerId: string) => {
   // request status update
   await Request.findByIdAndUpdate(
     offer.request,
-    { status: 'assigned' },
+    {
+      status: 'assigned',
+      provider: offer.provider,
+    },
     { returnDocument: 'after' },
   );
 };
@@ -156,7 +172,7 @@ export {
   deleteRequest,
   viewOpenRequest,
   getOffersForRequest,
-  acceptedOffers,
+  selectedProvider,
   acceptOffer,
   viewSelectedOfferForRequest,
 };
