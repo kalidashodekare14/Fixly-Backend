@@ -8,10 +8,12 @@ import {
   sendOfferedInfoController,
   providerJobsInfoController,
   jobsStatusChangeController,
+  overviewInfoController,
 } from './providerController';
 import { authMiddleware } from '../../middlewares/authMiddleware';
 import { upload } from '../../config/multerStorage';
 
+router.get('/provider_overview', authMiddleware, overviewInfoController);
 router.get('/', authMiddleware, providerInfoController);
 router.put(
   '/',
