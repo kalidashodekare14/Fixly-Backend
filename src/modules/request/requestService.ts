@@ -9,7 +9,15 @@ const createRequest = async (userId: string, requestData: IRequestClient) => {
   const request = await Request.create({
     ...requestData,
     user: userId,
+    ...(requestData.requestType === 'direct' && {
+      provider: requestData.providerId,
+    }),
+    status: requestData.requestType === 'direct' ? 'assigned' : 'pending',
   });
+
+  if (requestData.requestType === 'direc') {
+    return { request, offer: [] };
+  }
 
   // find nearby providers based on location
   const nearbyProviders = await Provider.find({

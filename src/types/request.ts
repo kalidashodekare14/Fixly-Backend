@@ -39,6 +39,8 @@ interface IRequestClient {
   };
   deadline: string;
   image?: string;
+  providerId: string;
+  requestType: string;
 }
 
 export { IRequest, IRequestClient };

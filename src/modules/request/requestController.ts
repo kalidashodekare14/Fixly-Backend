@@ -20,6 +20,8 @@ const createRequestController = async (req: Request, res: Response) => {
       location = JSON.parse(req.body.location);
     }
 
+    console.log('checking request id', req.body.providerId);
+
     const requestData = {
       category: req.body.category,
       title: req.body.title,
@@ -28,6 +30,8 @@ const createRequestController = async (req: Request, res: Response) => {
       deadline: req.body.deadline,
       location,
       image: req.file?.path,
+      providerId: req.body.providerId,
+      requestType: req.body.requestType,
     };
 
     const { request, offers } = await createRequest(userId, requestData);
