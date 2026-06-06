@@ -3,6 +3,50 @@ import { IRequest, IRequestClient } from '../../types/request';
 import Provider from '../../models/provider';
 import { dispatchRequest } from '../../utils/dispatchRequest';
 import Offer from '../../models/offer';
+import mongoose from 'mongoose';
+
+const overviewInfo = async (userId: string) => {
+  const totalRequests = await Request.countDocuments({
+    user: userId,
+  });
+
+  const pendingRequests = await Request.countDocuments({
+    user: userId,
+    status: 'pending',
+  });
+
+  const assignedJobs = await Request.countDocuments({
+    user: userId,
+    status: { $in: ['assigned', 'in_progress'] },
+  });
+
+  const completedJobs = await Request.countDocuments({
+    user: userId,
+    status: 'completed',
+  });
+
+  const budgetSummary = await Request.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalBudget: { $sum: '$budget' },
+      },
+    },
+  ]);
+
+  return {
+    totalRequests,
+    pendingRequests,
+    assignedJobs,
+    completedJobs,
+    budgetSummary: budgetSummary[0],
+  };
+};
 
 const createRequest = async (userId: string, requestData: IRequestClient) => {
   // save data to database
@@ -166,6 +210,7 @@ const acceptOffer = async (userId: string, offerId: string) => {
 };
 
 export {
+  overviewInfo,
   createRequest,
   getRequest,
   requestUpdate,

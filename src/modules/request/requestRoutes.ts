@@ -11,11 +11,15 @@ import {
   getSelectedProviderController,
   viewOpenRequestController,
   viewSelectedOfferForRequestController,
+  overviewInfoController,
 } from './requestController';
 import { authMiddleware } from '../../middlewares/authMiddleware';
 import { upload } from '../../config/multerStorage';
 
 // Define routes
+
+router.get('/user_overivew', authMiddleware, overviewInfoController);
+
 router.post(
   '/',
   authMiddleware,

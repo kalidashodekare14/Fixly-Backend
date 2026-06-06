@@ -8,9 +8,30 @@ import {
   selectedProvider,
   viewOpenRequest,
   viewSelectedOfferForRequest,
+  overviewInfo,
 } from './requestService';
 import { Request, Response } from 'express';
 import sendResponse from '../../utils/sendResponse';
+
+const overviewInfoController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const result = await overviewInfo(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Overivew info get successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
 
 const createRequestController = async (req: Request, res: Response) => {
   try {
@@ -240,6 +261,7 @@ const acceptOfferController = async (req: Request, res: Response) => {
 };
 
 export {
+  overviewInfoController,
   createRequestController,
   getRequestController,
   updateRequestController,
