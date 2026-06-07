@@ -102,6 +102,7 @@ const overviewInfo = async (userId: string) => {
     'Nov',
     'Dec',
   ];
+
   const formated = monthlyEarnings.map((item) => ({
     month: months[item._id.month],
     amount: item.total,
