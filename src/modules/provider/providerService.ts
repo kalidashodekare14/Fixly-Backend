@@ -141,7 +141,16 @@ const overviewInfo = async (userId: string) => {
     },
   ]);
 
-  console.log('checking category', categoryStats);
+  // recent requests
+  const recentRequests = await Request.find({
+    provider: provider._id,
+  })
+    .sort({ createdAt: 1 })
+    .limit(5)
+    .populate('category', 'label')
+    .populate('user', 'name');
+
+  console.log('checking recent requests', recentRequests);
 
   return {
     pendingRequests,
@@ -150,6 +159,7 @@ const overviewInfo = async (userId: string) => {
     completedEarnings: completedEarnings[0],
     monthlyEarnings: formated,
     categoryStats,
+    recentRequests,
   };
 };
 
