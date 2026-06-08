@@ -1,8 +1,12 @@
 import express from 'express';
-import { createCategoriesController } from './adminController';
+import {
+  adminOverviewInfoController,
+  createCategoriesController,
+} from './adminController';
 
 const router = express.Router();
 
+router.get('/overview', adminOverviewInfoController);
 router.post('/categories', createCategoriesController);
 
 export default router;

@@ -1,6 +1,24 @@
 import { Request, Response } from 'express';
 import sendResponse from '../../utils/sendResponse';
-import { createCategories } from './adminService';
+import { adminOverviewInfo, createCategories } from './adminService';
+
+const adminOverviewInfoController = async (req: Request, res: Response) => {
+  try {
+    const result = await adminOverviewInfo();
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Overview info get successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Failed to overview info',
+    });
+  }
+};
 
 const createCategoriesController = async (req: Request, res: Response) => {
   try {
@@ -20,4 +38,4 @@ const createCategoriesController = async (req: Request, res: Response) => {
   }
 };
 
-export { createCategoriesController };
+export { adminOverviewInfoController, createCategoriesController };
