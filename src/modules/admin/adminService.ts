@@ -164,9 +164,56 @@ const adminOverviewInfo = async () => {
   };
 };
 
+const usersManage = async (queryData: any) => {
+  const { role, search } = queryData;
+
+  const filter: any = {};
+
+  if (role && role !== 'all') {
+    filter.role = role;
+  }
+
+  if (search) {
+    filter.$or = [
+      {
+        name: {
+          $regex: search,
+          $options: 'i',
+        },
+      },
+      {
+        email: {
+          $regex: search,
+          $options: 'i',
+        },
+      },
+    ];
+  }
+
+  const users = await User.find(filter);
+
+  return users;
+};
+
+const userStatusChange = async (userId: string, data: any) => {
+  const updateStatus = await User.findByIdAndUpdate(
+    userId,
+    {
+      $set: {
+        status: data.status,
+      },
+    },
+    {
+      returnDocument: 'after',
+    },
+  );
+
+  return updateStatus;
+};
+
 const createCategories = async (categories: any) => {
   const category = await Category.insertMany(categories);
   return category;
 };
 
-export { adminOverviewInfo, createCategories };
+export { usersManage, adminOverviewInfo, userStatusChange, createCategories };
