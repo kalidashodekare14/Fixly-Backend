@@ -1,6 +1,67 @@
 import { Request, Response } from 'express';
 import sendResponse from '../../utils/sendResponse';
-import { createCategories } from './adminService';
+import {
+  adminOverviewInfo,
+  createCategories,
+  usersManage,
+  userStatusChange,
+} from './adminService';
+
+const adminOverviewInfoController = async (req: Request, res: Response) => {
+  try {
+    const result = await adminOverviewInfo();
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Overview info get successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Failed to overview info',
+    });
+  }
+};
+
+const usersManageController = async (req: Request, res: Response) => {
+  try {
+    const result = await usersManage(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Manage users successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Failed to manage users',
+    });
+  }
+};
+
+const userStatusChangeController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.params.id.toString();
+    const statusData = req.body;
+    const result = await userStatusChange(userId, statusData);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Manage status change successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Failed to manage status change',
+    });
+  }
+};
 
 const createCategoriesController = async (req: Request, res: Response) => {
   try {
@@ -20,4 +81,9 @@ const createCategoriesController = async (req: Request, res: Response) => {
   }
 };
 
-export { createCategoriesController };
+export {
+  adminOverviewInfoController,
+  usersManageController,
+  userStatusChangeController,
+  createCategoriesController,
+};

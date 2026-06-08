@@ -4,6 +4,7 @@ import user from '../../models/user';
 import Offer from '../../models/offer';
 import Request from '../../models/request';
 import { populate } from 'dotenv';
+import Provider from '../../models/provider';
 
 interface IUserData {
   image?: string;
@@ -18,6 +19,150 @@ interface IOfferCreateData {
   message?: string;
   estimatedTime?: Date;
 }
+
+const overviewInfo = async (userId: string) => {
+  const provider = await Provider.findOne({
+    user: userId,
+  });
+
+  if (!provider) {
+    throw new Error('Provider not found');
+  }
+
+  const pendingRequests = await Offer.countDocuments({
+    provider: provider._id,
+    status: 'pending',
+  });
+
+  const activeJobs = await Request.countDocuments({
+    provider: provider._id,
+    status: { $in: ['assigned', 'in_progress'] },
+  });
+
+  const completedJobs = await Request.countDocuments({
+    provider: provider._id,
+    status: 'completed',
+  });
+
+  const completedEarnings = await Request.aggregate([
+    {
+      $match: {
+        provider: provider._id,
+        status: 'completed',
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: {
+          $sum: '$budget',
+        },
+      },
+    },
+  ]);
+
+  const monthlyEarnings = await Request.aggregate([
+    {
+      $match: {
+        provider: provider._id,
+        status: 'completed',
+      },
+    },
+    {
+      $group: {
+        _id: {
+          year: { $year: '$createdAt' },
+          month: { $month: '$createdAt' },
+        },
+        total: {
+          $sum: '$budget',
+        },
+      },
+    },
+    {
+      $sort: {
+        '_id.year': 1,
+        '_id.month': 1,
+      },
+    },
+  ]);
+
+  const months = [
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  const formated = monthlyEarnings.map((item) => ({
+    month: months[item._id.month],
+    amount: item.total,
+  }));
+
+  // category starts
+  const categoryStats = await Request.aggregate([
+    {
+      $match: {
+        provider: provider._id,
+        status: 'completed',
+      },
+    },
+    {
+      $group: {
+        _id: '$category',
+        value: { $sum: 1 },
+      },
+    },
+    {
+      $lookup: {
+        from: 'categories',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    {
+      $unwind: '$category',
+    },
+    {
+      $project: {
+        _id: 0,
+        name: '$category.label',
+        value: 1,
+      },
+    },
+  ]);
+
+  // recent requests
+  const recentRequests = await Request.find({
+    provider: provider._id,
+  })
+    .sort({ createdAt: 1 })
+    .limit(5)
+    .populate('category', 'label')
+    .populate('user', 'name');
+
+  console.log('checking recent requests', recentRequests);
+
+  return {
+    pendingRequests,
+    activeJobs,
+    completedJobs,
+    completedEarnings: completedEarnings[0],
+    monthlyEarnings: formated,
+    categoryStats,
+    recentRequests,
+  };
+};
 
 const providerInfo = async (providerId: string) => {
   const providerData = await provider
@@ -263,6 +408,7 @@ const jobStatusChange = async (userId: string, data: any) => {
 };
 
 export {
+  overviewInfo,
   providerInfo,
   providerInfoUpdate,
   requestInfo,

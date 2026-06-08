@@ -7,8 +7,30 @@ import {
   providerJobsInfo,
   requestInfo,
   jobStatusChange,
+  overviewInfo,
 } from './providerService';
 import sendResponse from '../../utils/sendResponse';
+
+const overviewInfoController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id;
+    const result = await overviewInfo(userId);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      data: result,
+      message: 'Overview information get successfully',
+    });
+  } catch (error: any) {
+    console.log(error.message);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      data: null,
+      message: 'Failed to overview information',
+    });
+  }
+};
 
 const providerInfoController = async (req: Request, res: Response) => {
   try {
@@ -180,6 +202,7 @@ const jobsStatusChangeController = async (req: Request, res: Response) => {
 };
 
 export {
+  overviewInfoController,
   providerInfoController,
   providerInfoUpdateController,
   requestInfoController,

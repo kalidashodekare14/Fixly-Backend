@@ -3,6 +3,133 @@ import { IRequest, IRequestClient } from '../../types/request';
 import Provider from '../../models/provider';
 import { dispatchRequest } from '../../utils/dispatchRequest';
 import Offer from '../../models/offer';
+import mongoose from 'mongoose';
+
+const overviewInfo = async (userId: string) => {
+  const totalRequests = await Request.countDocuments({
+    user: userId,
+  });
+
+  const pendingRequests = await Request.countDocuments({
+    user: userId,
+    status: 'pending',
+  });
+
+  const assignedJobs = await Request.countDocuments({
+    user: userId,
+    status: { $in: ['assigned', 'in_progress'] },
+  });
+
+  const completedJobs = await Request.countDocuments({
+    user: userId,
+    status: 'completed',
+  });
+
+  const budgetSummary = await Request.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalBudget: { $sum: '$budget' },
+      },
+    },
+  ]);
+
+  const mongthlyBudget = await Request.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+        status: 'completed',
+      },
+    },
+    {
+      $group: {
+        _id: {
+          year: { $year: '$createdAt' },
+          month: { $month: '$createdAt' },
+        },
+        total: {
+          $sum: '$budget',
+        },
+      },
+    },
+    {
+      $sort: {
+        '_id.year': 1,
+        '_id.month': 1,
+      },
+    },
+  ]);
+
+  const months = [
+    '',
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
+
+  const formated = mongthlyBudget.map((item) => ({
+    month: months[item._id.month],
+    amount: item.total,
+  }));
+
+  // category starts
+  const categoryStats = await Request.aggregate([
+    {
+      $match: {
+        user: new mongoose.Types.ObjectId(userId),
+        status: 'completed',
+      },
+    },
+    {
+      $group: {
+        _id: '$category',
+        value: { $sum: 1 },
+      },
+    },
+    {
+      $lookup: {
+        from: 'categories',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'category',
+      },
+    },
+    {
+      $unwind: '$category',
+    },
+    {
+      $project: {
+        _id: 0,
+        name: '$category.label',
+        value: 1,
+      },
+    },
+  ]);
+
+  return {
+    totalRequests,
+    pendingRequests,
+    assignedJobs,
+    completedJobs,
+    budgetSummary: budgetSummary[0],
+    mongthlyBudget: formated,
+    categoryStats,
+  };
+};
 
 const createRequest = async (userId: string, requestData: IRequestClient) => {
   // save data to database
@@ -166,6 +293,7 @@ const acceptOffer = async (userId: string, offerId: string) => {
 };
 
 export {
+  overviewInfo,
   createRequest,
   getRequest,
   requestUpdate,
