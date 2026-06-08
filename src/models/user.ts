@@ -21,7 +21,7 @@ export interface IUser extends Document {
   averageRating: number;
   totalReviews: number;
   comparePassword(candidatePassword: string): Promise<boolean>;
-  status: 'active' | 'suspended' | 'pending';
+  status: 'active' | 'suspend';
 }
 
 const userSchema = new Schema<IUser>(
@@ -85,7 +85,7 @@ const userSchema = new Schema<IUser>(
     },
     status: {
       type: String,
-      enum: ['active', 'suspended', 'pending'],
+      enum: ['active', 'suspend'],
     },
   },
   {

@@ -165,8 +165,18 @@ const adminOverviewInfo = async () => {
 };
 
 const usersManage = async (queryData: any) => {
-  const { role, search } = queryData;
+  const { role, search, currentPage, dataLimit } = queryData;
 
+  // user info
+  const totalUsers = await User.countDocuments();
+  const totalActiveUsers = await User.countDocuments({
+    status: 'active',
+  });
+  const totalSuspendUsers = await User.countDocuments({
+    status: 'suspend',
+  });
+
+  // Data filter
   const filter: any = {};
 
   if (role && role !== 'all') {
@@ -190,9 +200,29 @@ const usersManage = async (queryData: any) => {
     ];
   }
 
-  const users = await User.find(filter);
+  // pagination
+  const page = Number(currentPage) || 1;
+  const limit = Number(dataLimit) || 10;
+  const skip = (page - 1) * limit;
 
-  return users;
+  const users = await User.find(filter).skip(skip).limit(limit);
+
+  const total = await User.countDocuments(filter);
+
+  return {
+    statsInfo: {
+      totalUsers,
+      totalActiveUsers,
+      totalSuspendUsers,
+    },
+    data: users,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
 const userStatusChange = async (userId: string, data: any) => {
