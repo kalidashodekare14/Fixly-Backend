@@ -3,7 +3,11 @@ import { IRequest, IRequestClient } from '../../types/request';
 import Provider from '../../models/provider';
 import { dispatchRequest } from '../../utils/dispatchRequest';
 import Offer from '../../models/offer';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
+import { config } from '../../config/env';
+import User from '../../models/user';
+import axios from 'axios';
+import Payment from '../../models/payment';
 
 const overviewInfo = async (userId: string) => {
   const totalRequests = await Request.countDocuments({
@@ -292,6 +296,183 @@ const acceptOffer = async (userId: string, offerId: string) => {
   );
 };
 
+// sslcommerz payment api
+const sslcommerzPayment = async (
+  userId: string,
+  data: {
+    requestId: string;
+    offerId?: string;
+  },
+) => {
+  const { requestId, offerId } = data;
+
+  const tnxId = new Types.ObjectId().toString();
+
+  // 1. Get request + user
+  const request = await Request.findById(requestId);
+  const user = await User.findById(userId);
+
+  if (!request || !user) {
+    throw new Error('Invalid payment data');
+  }
+
+  let offer = null;
+  let amount = 0;
+  let providerId = request.provider;
+
+  // 2. Decide flow
+  if (request.requestType === 'direct') {
+    amount = request.budget ?? 0;
+  } else {
+    if (!offerId) {
+      throw new Error('OfferId required for normal request');
+    }
+
+    offer = await Offer.findById(offerId);
+
+    if (!offer) {
+      throw new Error('Offer not found');
+    }
+
+    amount = offer.offeredPrice ?? 0;
+    providerId = offer.provider;
+  }
+
+  // 3. Create payment
+  const paymentInfo = await Payment.create({
+    request: requestId,
+    offer: offer?._id || null,
+    user: request.user,
+    provider: providerId,
+
+    amount: amount,
+
+    transactionId: tnxId,
+
+    status: 'pending',
+  });
+
+  // 4. SSLCommerz payload
+  const initData = {
+    store_id: config.SSL_COMMERZ_STORE_ID,
+    store_passwd: config.SSL_COMMERZ_STORE_PASSWORD,
+
+    total_amount: amount,
+    currency: 'BDT',
+    tran_id: tnxId,
+
+    success_url: `${config.BACKEND_URL}/api/request/payment_success`,
+    fail_url: `${config.BACKEND_URL}/api/request/payments_fail`,
+    cancel_url: `${config.BACKEND_URL}/api/request/payments_cancel`,
+
+    cus_name: user.name || 'N/A',
+    cus_email: user.email || 'N/A',
+    cus_phone: user.phone || '0000000000',
+
+    product_name: 'Home Service Payment',
+    product_category: 'service',
+    product_profile: 'general',
+
+    shipping_method: 'NO',
+
+    value_a: paymentInfo._id.toString(),
+    value_b: requestId,
+    value_c: userId,
+    value_d: tnxId,
+  };
+
+  // 5. Call SSLCommerz
+  const response = await axios({
+    method: 'POST',
+    url: 'https://sandbox.sslcommerz.com/gwprocess/v4/api.php',
+    data: new URLSearchParams(initData as any).toString(),
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+
+  if (!response.data?.GatewayPageURL) {
+    throw new Error('Payment gateway failed');
+  }
+
+  return {
+    paymentUrl: response.data.GatewayPageURL,
+    transactionId: tnxId,
+  };
+};
+
+const paymentSuccessAndStatusChange = async (paymentId: string) => {
+  const payment = await Payment.findById(paymentId);
+
+  if (!payment) {
+    throw new Error('Payment not found');
+  }
+
+  // prevent duplicate success call
+  if (payment.status === 'paid') {
+    return payment;
+  }
+
+  // payment paid
+  payment.status = 'paid';
+  await payment.save();
+
+  const request = await Request.findById(payment.request);
+
+  if (!request) {
+    throw new Error('Request not found');
+  }
+
+  // DIRECT HIRE FLOW
+  if (request.requestType === 'direct') {
+    await Request.findByIdAndUpdate(
+      request._id,
+      {
+        status: 'assigned',
+      },
+      { new: true },
+    );
+
+    return;
+  }
+
+  // NORMAL OFFER FLOW
+  const offer = await Offer.findById(payment.offer);
+
+  if (!offer) {
+    throw new Error('Offer not found');
+  }
+
+  // accepted offer
+  await Offer.findByIdAndUpdate(offer._id, {
+    status: 'accepted',
+  });
+
+  // reject others
+  await Offer.updateMany(
+    {
+      request: offer.request,
+      _id: { $ne: offer._id },
+      status: 'offered',
+    },
+    {
+      status: 'rejected',
+    },
+  );
+
+  // assign provider
+  await Request.findByIdAndUpdate(
+    offer.request,
+    {
+      status: 'assigned',
+      provider: offer.provider,
+    },
+    { new: true },
+  );
+
+  return;
+};
+
 export {
   overviewInfo,
   createRequest,
@@ -303,4 +484,6 @@ export {
   selectedProvider,
   acceptOffer,
   viewSelectedOfferForRequest,
+  sslcommerzPayment,
+  paymentSuccessAndStatusChange,
 };

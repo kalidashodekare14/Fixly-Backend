@@ -12,6 +12,10 @@ import {
   viewOpenRequestController,
   viewSelectedOfferForRequestController,
   overviewInfoController,
+  sslcommerzPaymentController,
+  paymentSuccessController,
+  paymentFailController,
+  paymentCancelController,
 } from './requestController';
 import { authMiddleware } from '../../middlewares/authMiddleware';
 import { upload } from '../../config/multerStorage';
@@ -50,5 +54,9 @@ router.get(
 );
 router.get('/:requestId/offers', authMiddleware, getOffersForRequestController);
 router.put('/offers/:offerId/accept', authMiddleware, acceptOfferController);
+router.post('/ssl_payment', authMiddleware, sslcommerzPaymentController);
+router.post('/payment_success', paymentSuccessController);
+router.post('/payments_fail', paymentFailController);
+router.post('/payments_cancel', paymentCancelController);
 
 export default router;

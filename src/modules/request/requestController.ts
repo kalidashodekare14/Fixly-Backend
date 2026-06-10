@@ -9,9 +9,13 @@ import {
   viewOpenRequest,
   viewSelectedOfferForRequest,
   overviewInfo,
+  sslcommerzPayment,
+  paymentSuccessAndStatusChange,
 } from './requestService';
 import { Request, Response } from 'express';
 import sendResponse from '../../utils/sendResponse';
+import { config } from '../../config/env';
+import Payment from '../../models/payment';
 
 const overviewInfoController = async (req: Request, res: Response) => {
   try {
@@ -260,6 +264,76 @@ const acceptOfferController = async (req: Request, res: Response) => {
   }
 };
 
+const sslcommerzPaymentController = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user.id.toString();
+    const paymentInfo = req.body;
+    const result = await sslcommerzPayment(userId, paymentInfo);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Offer accepted successfully',
+      data: result,
+    });
+  } catch (error) {
+    console.error('Error accepting offer:', error);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
+const paymentSuccessController = async (req: Request, res: Response) => {
+  try {
+    const paymentId = req.body.value_a;
+
+    await paymentSuccessAndStatusChange(paymentId);
+
+    res.redirect(`${config.FRONTEND_URL}/payment-success`);
+  } catch (error) {
+    res.redirect(`${config.FRONTEND_URL}/payment-failed`);
+  }
+};
+
+const paymentFailController = async (req: Request, res: Response) => {
+  try {
+    const paymentId = req.body.value_a;
+
+    if (paymentId) {
+      await Payment.findByIdAndUpdate(paymentId, {
+        status: 'failed',
+      });
+    }
+
+    return res.redirect(`${config.FRONTEND_URL}/payment-failed`);
+  } catch (error) {
+    console.error('Payment fail error:', error);
+
+    return res.redirect(`${config.FRONTEND_URL}/payment-failed`);
+  }
+};
+
+const paymentCancelController = async (req: Request, res: Response) => {
+  try {
+    const paymentId = req.body.value_a;
+
+    if (paymentId) {
+      await Payment.findByIdAndUpdate(paymentId, {
+        status: 'cancelled',
+      });
+    }
+
+    return res.redirect(`${config.FRONTEND_URL}/payment-cancelled`);
+  } catch (error) {
+    console.error('Payment cancel error:', error);
+
+    return res.redirect(`${config.FRONTEND_URL}/payment-cancelled`);
+  }
+};
+
 export {
   overviewInfoController,
   createRequestController,
@@ -271,4 +345,8 @@ export {
   getSelectedProviderController,
   viewOpenRequestController,
   viewSelectedOfferForRequestController,
+  sslcommerzPaymentController,
+  paymentSuccessController,
+  paymentFailController,
+  paymentCancelController,
 };
