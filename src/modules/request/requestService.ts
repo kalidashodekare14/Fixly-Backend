@@ -493,6 +493,35 @@ const getMyPaymentHistory = async (
 ) => {
   const { search, status } = queryData;
 
+  // kpi info
+  const totalSpent = await Payment.aggregate([
+    {
+      $match: {
+        user: new Types.ObjectId(userId),
+        status: 'paid',
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: '$amount' },
+      },
+    },
+  ]);
+  const totalPaid = await Payment.countDocuments({
+    user: userId,
+    status: 'paid',
+  });
+  const totalPending = await Payment.countDocuments({
+    user: userId,
+    status: 'pending',
+  });
+  const totalFailed = await Payment.countDocuments({
+    user: userId,
+    status: 'failed',
+  });
+
+  // filter data
   const filter: any = {
     user: userId,
   };
@@ -563,7 +592,15 @@ const getMyPaymentHistory = async (
     })
     .sort({ createdAt: -1 });
 
-  return payments;
+  return {
+    paymentInfo: payments,
+    kpiInfo: {
+      totalSpent,
+      totalPaid,
+      totalPending,
+      totalFailed,
+    },
+  };
 };
 
 export {
