@@ -3,7 +3,6 @@ import { IProviderUpdate } from '../../types/provider';
 import user from '../../models/user';
 import Offer from '../../models/offer';
 import Request from '../../models/request';
-import { populate } from 'dotenv';
 import Provider from '../../models/provider';
 import Review from '../../models/review';
 

@@ -11,6 +11,7 @@ import {
   overviewInfo,
   sslcommerzPayment,
   paymentSuccessAndStatusChange,
+  getMyPaymentHistory,
 } from './requestService';
 import { Request, Response } from 'express';
 import sendResponse from '../../utils/sendResponse';
@@ -334,6 +335,25 @@ const paymentCancelController = async (req: Request, res: Response) => {
   }
 };
 
+const getMyPaymentHistoryController = async (req: any, res: any) => {
+  try {
+    const payments = await getMyPaymentHistory(req.user.id, req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Payment history fetched successfully',
+      data: payments,
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export {
   overviewInfoController,
   createRequestController,
@@ -349,4 +369,5 @@ export {
   paymentSuccessController,
   paymentFailController,
   paymentCancelController,
+  getMyPaymentHistoryController,
 };

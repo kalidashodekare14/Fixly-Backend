@@ -486,6 +486,86 @@ const paymentSuccessAndStatusChange = async (paymentId: string) => {
   return;
 };
 
+// payment history
+const getMyPaymentHistory = async (
+  userId: string,
+  queryData: { search: string; status: string },
+) => {
+  const { search, status } = queryData;
+
+  const filter: any = {
+    user: userId,
+  };
+
+  if (status && status !== 'all') {
+    filter.status = status;
+  }
+
+  if (search) {
+    // 1. match requests (service title)
+    const matchedRequests = await Request.find({
+      title: {
+        $regex: search,
+        $options: 'i',
+      },
+    }).select('_id');
+
+    // 2. match providers by user name/email
+    const matchedUsers = await User.find({
+      $or: [
+        {
+          name: { $regex: search, $options: 'i' },
+        },
+        {
+          email: { $regex: search, $options: 'i' },
+        },
+      ],
+    }).select('_id');
+
+    const matchedProviders = await Provider.find({
+      user: {
+        $in: matchedUsers.map((u) => u._id),
+      },
+    }).select('_id');
+
+    // OR filter
+    filter.$or = [
+      {
+        provider: {
+          $in: matchedProviders.map((p) => p._id),
+        },
+      },
+      {
+        request: {
+          $in: matchedRequests.map((r) => r._id),
+        },
+      },
+      {
+        transactionId: {
+          $regex: search,
+          $options: 'i',
+        },
+      },
+    ];
+  }
+
+  const payments = await Payment.find(filter)
+    .populate({
+      path: 'request',
+      select: 'title image',
+    })
+    .populate({
+      path: 'provider',
+      populate: {
+        path: 'user',
+        select: 'name image',
+      },
+    })
+    .sort({ createdAt: -1 });
+
+  return payments;
+};
+
 export {
   overviewInfo,
   createRequest,
@@ -499,4 +579,5 @@ export {
   viewSelectedOfferForRequest,
   sslcommerzPayment,
   paymentSuccessAndStatusChange,
+  getMyPaymentHistory,
 };

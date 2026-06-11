@@ -16,6 +16,7 @@ import {
   paymentSuccessController,
   paymentFailController,
   paymentCancelController,
+  getMyPaymentHistoryController,
 } from './requestController';
 import { authMiddleware } from '../../middlewares/authMiddleware';
 import { upload } from '../../config/multerStorage';
@@ -58,5 +59,7 @@ router.post('/ssl_payment', authMiddleware, sslcommerzPaymentController);
 router.post('/payment_success', paymentSuccessController);
 router.post('/payments_fail', paymentFailController);
 router.post('/payments_cancel', paymentCancelController);
+// payment history
+router.get('/my-payments', authMiddleware, getMyPaymentHistoryController);
 
 export default router;
