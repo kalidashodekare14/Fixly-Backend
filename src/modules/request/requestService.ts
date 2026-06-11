@@ -8,6 +8,7 @@ import { config } from '../../config/env';
 import User from '../../models/user';
 import axios from 'axios';
 import Payment from '../../models/payment';
+import Review from '../../models/review';
 
 const overviewInfo = async (userId: string) => {
   const totalRequests = await Request.countDocuments({
@@ -215,11 +216,23 @@ const viewOpenRequest = async (userId: string) => {
 };
 
 const viewSelectedOfferForRequest = async (userId: string) => {
-  const request = await Request.find({
+  const requests = await Request.find({
     user: userId,
     status: { $in: ['assigned', 'in_progress', 'completed'] },
   }).populate('category', 'label');
-  return request;
+
+  const reviews = await Review.find({
+    user: userId,
+  }).select('request');
+
+  const reviewedRequestIds = reviews.map((review) => review.request.toString());
+
+  const result = requests.map((request) => ({
+    ...request.toObject(),
+    isReviewed: reviewedRequestIds.includes(request._id.toString()),
+  }));
+
+  return result;
 };
 
 const getOffersForRequest = async (requestId: string) => {

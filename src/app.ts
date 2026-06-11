@@ -9,6 +9,7 @@ import providerRoutes from './modules/provider/providerRoutes';
 import requestRoutes from './modules/request/requestRoutes';
 import publicRoutes from './modules/public/publicRoutes';
 import adminRoutes from './modules/admin/adminRoutes';
+import reviewRoutes from './modules/review/reviewRoutes';
 
 // Initialize Express app
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/provider', providerRoutes);
 app.use('/api/request', requestRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/review', reviewRoutes);
 
 // Global error handler
 app.use((err: Error, _req: Request, res: Response, next: NextFunction) => {
