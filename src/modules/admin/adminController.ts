@@ -3,6 +3,7 @@ import sendResponse from '../../utils/sendResponse';
 import {
   adminOverviewInfo,
   createCategories,
+  requestsManage,
   usersManage,
   userStatusChange,
 } from './adminService';
@@ -63,6 +64,24 @@ const userStatusChangeController = async (req: Request, res: Response) => {
   }
 };
 
+const requestsManageController = async (req: Request, res: Response) => {
+  try {
+    const result = await requestsManage(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Manage requests successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Failed to manage requests',
+    });
+  }
+};
+
 const createCategoriesController = async (req: Request, res: Response) => {
   try {
     const result = await createCategories(req.body);
@@ -85,5 +104,6 @@ export {
   adminOverviewInfoController,
   usersManageController,
   userStatusChangeController,
+  requestsManageController,
   createCategoriesController,
 };

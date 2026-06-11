@@ -2,6 +2,7 @@ import Category from '../../models/category';
 import Provider from '../../models/provider';
 import User from '../../models/user';
 import Request from '../../models/request';
+import mongoose from 'mongoose';
 
 const adminOverviewInfo = async () => {
   const totalUsers = await User.countDocuments();
@@ -164,6 +165,7 @@ const adminOverviewInfo = async () => {
   };
 };
 
+// Manage users
 const usersManage = async (queryData: any) => {
   const { role, search, currentPage, dataLimit } = queryData;
 
@@ -241,9 +243,114 @@ const userStatusChange = async (userId: string, data: any) => {
   return updateStatus;
 };
 
+// Manage requests
+const requestsManage = async (queryData: any) => {
+  const { status, search, currentPage, dataLimit } = queryData;
+
+  // kpi info
+  const totalRequests = await Request.countDocuments();
+  const totalPending = await Request.countDocuments({
+    status: 'pending',
+  });
+  const totalOpened = await Request.countDocuments({
+    status: 'open',
+  });
+  const totalInProgress = await Request.countDocuments({
+    status: 'in_progress',
+  });
+  const totalAssigned = await Request.countDocuments({
+    status: 'assigned',
+  });
+  const totalCompleted = await Request.countDocuments({
+    status: 'completed',
+  });
+  const totalCancelled = await Request.countDocuments({
+    status: 'cancelled',
+  });
+
+  // Data filter
+  const filter: any = {};
+
+  const matchedUsers = await User.find({
+    $or: [
+      {
+        name: {
+          $regex: search,
+          $options: 'i',
+        },
+      },
+      {
+        email: {
+          $regex: search,
+          $options: 'i',
+        },
+      },
+    ],
+  }).select('_id');
+
+  if (search) {
+    filter.$or = [
+      {
+        user: {
+          $in: matchedUsers.map((u) => u._id),
+        },
+      },
+    ];
+
+    // Request ID search
+    if (mongoose.Types.ObjectId.isValid(search)) {
+      filter.$or.push({
+        _id: search,
+      });
+    }
+  }
+
+  if (status && status !== 'all') {
+    filter.status = status;
+  }
+
+  // pagination
+  const page = Number(currentPage) || 1;
+  const limit = Number(dataLimit) || 10;
+  const skip = (page - 1) * limit;
+
+  const requests = await Request.find(filter)
+    .populate('user', 'name email image')
+    .populate('category', 'label')
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Request.countDocuments(filter);
+
+  return {
+    kpiInfo: {
+      totalRequests,
+      totalPending,
+      totalOpened,
+      totalInProgress,
+      totalAssigned,
+      totalCompleted,
+      totalCancelled,
+    },
+    data: requests,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
 const createCategories = async (categories: any) => {
   const category = await Category.insertMany(categories);
   return category;
 };
 
-export { usersManage, adminOverviewInfo, userStatusChange, createCategories };
+export {
+  usersManage,
+  adminOverviewInfo,
+  userStatusChange,
+  requestsManage,
+  createCategories,
+};

@@ -23,6 +23,7 @@ interface IRequest {
     | 'completed'
     | 'cancelled';
   image: string;
+  requestType: 'normal' | 'direct';
 }
 
 interface IRequestClient {
@@ -40,7 +41,7 @@ interface IRequestClient {
   deadline: string;
   image?: string;
   providerId: string;
-  requestType: string;
+  requestType: 'normal' | 'direct';
 }
 
 export { IRequest, IRequestClient };

@@ -8,6 +8,7 @@ import {
   requestInfo,
   jobStatusChange,
   overviewInfo,
+  getProviderReviews,
 } from './providerService';
 import sendResponse from '../../utils/sendResponse';
 
@@ -201,6 +202,25 @@ const jobsStatusChangeController = async (req: Request, res: Response) => {
   }
 };
 
+const getProviderReviewsController = async (req: any, res: any) => {
+  try {
+    const reviews = await getProviderReviews(req.user.id);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Provider reviews fetched successfully',
+      data: reviews,
+    });
+  } catch (error: any) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 export {
   overviewInfoController,
   providerInfoController,
@@ -210,4 +230,5 @@ export {
   sendOfferedInfoController,
   providerJobsInfoController,
   jobsStatusChangeController,
+  getProviderReviewsController,
 };

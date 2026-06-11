@@ -3,8 +3,8 @@ import { IProviderUpdate } from '../../types/provider';
 import user from '../../models/user';
 import Offer from '../../models/offer';
 import Request from '../../models/request';
-import { populate } from 'dotenv';
 import Provider from '../../models/provider';
+import Review from '../../models/review';
 
 interface IUserData {
   image?: string;
@@ -407,6 +407,35 @@ const jobStatusChange = async (userId: string, data: any) => {
   );
 };
 
+const getProviderReviews = async (userId: string) => {
+  const provider = await Provider.findOne({
+    user: userId,
+  });
+
+  if (!provider) {
+    throw new Error('Provider not found');
+  }
+
+  const reviews = await Review.find({
+    provider: provider._id,
+  })
+    .populate({
+      path: 'user',
+      select: 'name image location',
+    })
+    .populate({
+      path: 'request',
+      select: 'title category',
+      populate: {
+        path: 'category',
+        select: 'label',
+      },
+    })
+    .sort({ createdAt: -1 });
+
+  return reviews;
+};
+
 export {
   overviewInfo,
   providerInfo,
@@ -416,4 +445,5 @@ export {
   offeredInfo,
   providerJobsInfo,
   jobStatusChange,
+  getProviderReviews,
 };

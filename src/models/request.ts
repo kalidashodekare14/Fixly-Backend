@@ -66,6 +66,10 @@ const requestSchema = new mongoose.Schema<IRequest>(
       ],
       default: 'pending',
     },
+    requestType: {
+      type: String,
+      enum: ['normal', 'direct'],
+    },
   },
   { timestamps: true },
 );
