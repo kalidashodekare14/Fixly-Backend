@@ -5,6 +5,7 @@ import {
   createCategories,
   paymentsManage,
   requestsManage,
+  reviewsManage,
   usersManage,
   userStatusChange,
 } from './adminService';
@@ -83,6 +84,24 @@ const requestsManageController = async (req: Request, res: Response) => {
   }
 };
 
+const reviewsManageController = async (req: Request, res: Response) => {
+  try {
+    const result = await reviewsManage(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Manage reviews successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Failed to manage reviews',
+    });
+  }
+};
+
 const paymentsManageController = async (req: Request, res: Response) => {
   try {
     const result = await paymentsManage(req.query);
@@ -125,5 +144,6 @@ export {
   userStatusChangeController,
   requestsManageController,
   paymentsManageController,
+  reviewsManageController,
   createCategoriesController,
 };
