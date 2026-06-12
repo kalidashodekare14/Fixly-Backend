@@ -5,6 +5,10 @@ import Offer from '../../models/offer';
 import Request from '../../models/request';
 import Provider from '../../models/provider';
 import Review from '../../models/review';
+import Payment from '../../models/payment';
+import User from '../../models/user';
+import { info } from 'console';
+import { Types } from 'mongoose';
 
 interface IUserData {
   image?: string;
@@ -436,6 +440,130 @@ const getProviderReviews = async (userId: string) => {
   return reviews;
 };
 
+const getProviderPaymentHistory = async (
+  userId: string,
+  queryData: { search?: string; status?: string },
+) => {
+  const { search = '', status } = queryData;
+
+  const provider = await Provider.findOne({
+    user: userId,
+  });
+
+  if (!provider) {
+    throw new Error('Provider not found');
+  }
+
+  // stats info
+  const totalEarnings = await Payment.aggregate([
+    {
+      $match: {
+        provider: new Types.ObjectId(provider._id),
+        status: 'paid',
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: '$amount' },
+      },
+    },
+  ]);
+
+  const totalPaid = await Payment.countDocuments({
+    provider: provider._id,
+    status: 'paid',
+  });
+  const totalPending = await Payment.countDocuments({
+    provider: provider._id,
+    status: 'pending',
+  });
+  const totalFailed = await Payment.countDocuments({
+    provider: provider._id,
+    status: 'failed',
+  });
+  const totalCancelled = await Payment.countDocuments({
+    provider: provider._id,
+    status: 'cancelled',
+  });
+
+  // filter
+  const filter: any = {
+    provider: provider._id,
+  };
+
+  if (status && status !== 'all') {
+    filter.status = status;
+  }
+
+  if (search) {
+    const matchedRequests = await Request.find({
+      title: {
+        $regex: search,
+        $options: 'i',
+      },
+    }).select('_id');
+
+    const matchedUsers = await User.find({
+      $or: [
+        {
+          name: {
+            $regex: search,
+            $options: 'i',
+          },
+        },
+        {
+          email: {
+            $regex: search,
+            $options: 'i',
+          },
+        },
+      ],
+    }).select('_id');
+
+    filter.$or = [
+      {
+        user: {
+          $in: matchedUsers.map((u) => u._id),
+        },
+      },
+      {
+        request: {
+          $in: matchedRequests.map((r) => r._id),
+        },
+      },
+      {
+        transactionId: {
+          $regex: search,
+          $options: 'i',
+        },
+      },
+    ];
+  }
+
+  const payments = await Payment.find(filter)
+    .populate({
+      path: 'request',
+      select: 'title image',
+    })
+    .populate({
+      path: 'user',
+      select: 'name image',
+    })
+    .sort({ createdAt: -1 });
+
+  return {
+    payments: payments,
+    statsInfo: {
+      totalEarnings,
+      totalPaid,
+      totalPending,
+      totalFailed,
+      totalCancelled,
+    },
+  };
+};
+
 export {
   overviewInfo,
   providerInfo,
@@ -446,4 +574,5 @@ export {
   providerJobsInfo,
   jobStatusChange,
   getProviderReviews,
+  getProviderPaymentHistory,
 };

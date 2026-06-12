@@ -10,6 +10,7 @@ import {
   jobsStatusChangeController,
   overviewInfoController,
   getProviderReviewsController,
+  getProviderPaymentHistoryController,
 } from './providerController';
 import { authMiddleware } from '../../middlewares/authMiddleware';
 import { upload } from '../../config/multerStorage';
@@ -28,5 +29,10 @@ router.get('/send_offered', authMiddleware, sendOfferedInfoController);
 router.get('/jobs', authMiddleware, providerJobsInfoController);
 router.put('/job_status', authMiddleware, jobsStatusChangeController);
 router.get('/provider-reviews', authMiddleware, getProviderReviewsController);
+router.get(
+  '/provider_payments',
+  authMiddleware,
+  getProviderPaymentHistoryController,
+);
 
 export default router;

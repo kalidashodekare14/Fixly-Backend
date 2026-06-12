@@ -2,6 +2,7 @@ import express from 'express';
 import {
   adminOverviewInfoController,
   createCategoriesController,
+  paymentsManageController,
   usersManageController,
   userStatusChangeController,
   requestsManageController,
@@ -13,6 +14,7 @@ router.get('/overview', adminOverviewInfoController);
 router.get('/manage_user', usersManageController);
 router.put('/:id/status_change', userStatusChangeController);
 router.get('/manage_requests', requestsManageController);
+router.get('/manage_payments', paymentsManageController);
 router.post('/categories', createCategoriesController);
 
 export default router;

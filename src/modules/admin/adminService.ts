@@ -2,6 +2,7 @@ import Category from '../../models/category';
 import Provider from '../../models/provider';
 import User from '../../models/user';
 import Request from '../../models/request';
+import Payment from '../../models/payment';
 import mongoose from 'mongoose';
 
 const adminOverviewInfo = async () => {
@@ -347,10 +348,91 @@ const createCategories = async (categories: any) => {
   return category;
 };
 
+// Manage payments
+const paymentsManage = async (queryData: any) => {
+  const { status, search, currentPage, dataLimit } = queryData;
+
+  // KPI info
+  const totalPayments = await Payment.countDocuments();
+  const totalPaid = await Payment.countDocuments({ status: 'paid' });
+  const totalPending = await Payment.countDocuments({ status: 'pending' });
+  const totalFailed = await Payment.countDocuments({ status: 'failed' });
+  const totalCancelled = await Payment.countDocuments({ status: 'cancelled' });
+  const totalRefunded = await Payment.countDocuments({ status: 'refunded' });
+
+  // Data filter
+  const filter: any = {};
+
+  if (status && status !== 'all') {
+    filter.status = status;
+  }
+
+  if (search) {
+    const matchedRequests = await Request.find({
+      title: { $regex: search, $options: 'i' },
+    }).select('_id');
+
+    const matchedUsers = await User.find({
+      $or: [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ],
+    }).select('_id');
+
+    const matchedProviders = await Provider.find({
+      user: { $in: matchedUsers.map((u) => u._id) },
+    }).select('_id');
+
+    filter.$or = [
+      { user: { $in: matchedUsers.map((u) => u._id) } },
+      { provider: { $in: matchedProviders.map((p) => p._id) } },
+      { request: { $in: matchedRequests.map((r) => r._id) } },
+      { transactionId: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  // Pagination
+  const page = Number(currentPage) || 1;
+  const limit = Number(dataLimit) || 10;
+  const skip = (page - 1) * limit;
+
+  const payments = await Payment.find(filter)
+    .populate({ path: 'user', select: 'name email image' })
+    .populate({
+      path: 'provider',
+      populate: { path: 'user', select: 'name email image' },
+    })
+    .populate({ path: 'request', select: 'title budget' })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Payment.countDocuments(filter);
+
+  return {
+    kpiInfo: {
+      totalPayments,
+      totalPaid,
+      totalPending,
+      totalFailed,
+      totalCancelled,
+      totalRefunded,
+    },
+    data: payments,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
 export {
   usersManage,
   adminOverviewInfo,
   userStatusChange,
   requestsManage,
   createCategories,
+  paymentsManage,
 };

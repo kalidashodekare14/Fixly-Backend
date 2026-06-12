@@ -3,6 +3,7 @@ import sendResponse from '../../utils/sendResponse';
 import {
   adminOverviewInfo,
   createCategories,
+  paymentsManage,
   requestsManage,
   usersManage,
   userStatusChange,
@@ -82,6 +83,24 @@ const requestsManageController = async (req: Request, res: Response) => {
   }
 };
 
+const paymentsManageController = async (req: Request, res: Response) => {
+  try {
+    const result = await paymentsManage(req.query);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Manage payments successfully',
+      data: result,
+    });
+  } catch (error) {
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Failed to manage payments',
+    });
+  }
+};
+
 const createCategoriesController = async (req: Request, res: Response) => {
   try {
     const result = await createCategories(req.body);
@@ -105,5 +124,6 @@ export {
   usersManageController,
   userStatusChangeController,
   requestsManageController,
+  paymentsManageController,
   createCategoriesController,
 };
