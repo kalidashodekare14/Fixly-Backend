@@ -505,17 +505,6 @@ const getProviderPaymentHistory = async (
     ];
   }
 
-  // if (search) {
-  //   filter.$or = [
-  //     {
-  //       transactionId: {
-  //         $regex: search,
-  //         $options: 'i',
-  //       },
-  //     },
-  //   ];
-  // }
-
   const payments = await Payment.find(filter)
     .populate({
       path: 'request',
