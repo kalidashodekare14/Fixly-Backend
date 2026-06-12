@@ -7,6 +7,8 @@ import Provider from '../../models/provider';
 import Review from '../../models/review';
 import Payment from '../../models/payment';
 import User from '../../models/user';
+import { info } from 'console';
+import { Types } from 'mongoose';
 
 interface IUserData {
   image?: string;
@@ -452,6 +454,40 @@ const getProviderPaymentHistory = async (
     throw new Error('Provider not found');
   }
 
+  // stats info
+  const totalEarnings = await Payment.aggregate([
+    {
+      $match: {
+        provider: new Types.ObjectId(provider._id),
+        status: 'paid',
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: '$amount' },
+      },
+    },
+  ]);
+
+  const totalPaid = await Payment.countDocuments({
+    provider: provider._id,
+    status: 'paid',
+  });
+  const totalPending = await Payment.countDocuments({
+    provider: provider._id,
+    status: 'pending',
+  });
+  const totalFailed = await Payment.countDocuments({
+    provider: provider._id,
+    status: 'failed',
+  });
+  const totalCancelled = await Payment.countDocuments({
+    provider: provider._id,
+    status: 'cancelled',
+  });
+
+  // filter
   const filter: any = {
     provider: provider._id,
   };
@@ -516,7 +552,16 @@ const getProviderPaymentHistory = async (
     })
     .sort({ createdAt: -1 });
 
-  return payments;
+  return {
+    payments: payments,
+    statsInfo: {
+      totalEarnings,
+      totalPaid,
+      totalPending,
+      totalFailed,
+      totalCancelled,
+    },
+  };
 };
 
 export {
