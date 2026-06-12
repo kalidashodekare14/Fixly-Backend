@@ -5,6 +5,8 @@ import Offer from '../../models/offer';
 import Request from '../../models/request';
 import Provider from '../../models/provider';
 import Review from '../../models/review';
+import Payment from '../../models/payment';
+import User from '../../models/user';
 
 interface IUserData {
   image?: string;
@@ -436,6 +438,98 @@ const getProviderReviews = async (userId: string) => {
   return reviews;
 };
 
+const getProviderPaymentHistory = async (
+  userId: string,
+  queryData: { search?: string; status?: string },
+) => {
+  const { search = '', status } = queryData;
+
+  const provider = await Provider.findOne({
+    user: userId,
+  });
+
+  if (!provider) {
+    throw new Error('Provider not found');
+  }
+
+  const filter: any = {
+    provider: provider._id,
+  };
+
+  if (status && status !== 'all') {
+    filter.status = status;
+  }
+
+  if (search) {
+    const matchedRequests = await Request.find({
+      title: {
+        $regex: search,
+        $options: 'i',
+      },
+    }).select('_id');
+
+    const matchedUsers = await User.find({
+      $or: [
+        {
+          name: {
+            $regex: search,
+            $options: 'i',
+          },
+        },
+        {
+          email: {
+            $regex: search,
+            $options: 'i',
+          },
+        },
+      ],
+    }).select('_id');
+
+    filter.$or = [
+      {
+        user: {
+          $in: matchedUsers.map((u) => u._id),
+        },
+      },
+      {
+        request: {
+          $in: matchedRequests.map((r) => r._id),
+        },
+      },
+      {
+        transactionId: {
+          $regex: search,
+          $options: 'i',
+        },
+      },
+    ];
+  }
+
+  // if (search) {
+  //   filter.$or = [
+  //     {
+  //       transactionId: {
+  //         $regex: search,
+  //         $options: 'i',
+  //       },
+  //     },
+  //   ];
+  // }
+
+  const payments = await Payment.find(filter)
+    .populate({
+      path: 'request',
+      select: 'title image',
+    })
+    .populate({
+      path: 'user',
+      select: 'name image',
+    })
+    .sort({ createdAt: -1 });
+
+  return payments;
+};
+
 export {
   overviewInfo,
   providerInfo,
@@ -446,4 +540,5 @@ export {
   providerJobsInfo,
   jobStatusChange,
   getProviderReviews,
+  getProviderPaymentHistory,
 };

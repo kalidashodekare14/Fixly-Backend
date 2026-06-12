@@ -9,6 +9,7 @@ import {
   jobStatusChange,
   overviewInfo,
   getProviderReviews,
+  getProviderPaymentHistory,
 } from './providerService';
 import sendResponse from '../../utils/sendResponse';
 
@@ -221,6 +222,23 @@ const getProviderReviewsController = async (req: any, res: any) => {
   }
 };
 
+const getProviderPaymentHistoryController = async (req: any, res: any) => {
+  try {
+    const data = await getProviderPaymentHistory(req.user.id, req.query);
+
+    res.status(200).json({
+      success: true,
+      message: 'Provider payment history fetched',
+      data,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export {
   overviewInfoController,
   providerInfoController,
@@ -231,4 +249,5 @@ export {
   providerJobsInfoController,
   jobsStatusChangeController,
   getProviderReviewsController,
+  getProviderPaymentHistoryController,
 };
