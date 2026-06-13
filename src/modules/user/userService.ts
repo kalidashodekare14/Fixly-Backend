@@ -15,6 +15,16 @@ type UpdateUserDTO = {
   image?: string;
 };
 
+const getNavbarProfile = async (userId: string) => {
+  const user = await User.findById(userId).select('image role name');
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  return user;
+};
+
 const userInfo = async (userId: string) => {
   const user = await User.findById(userId);
   if (!user) {
@@ -45,4 +55,4 @@ const updateUserInfo = async (userId: string, updateData: UpdateUserDTO) => {
   return user;
 };
 
-export { userInfo, updateUserInfo };
+export { getNavbarProfile, userInfo, updateUserInfo };
