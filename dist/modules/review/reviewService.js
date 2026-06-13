@@ -8,7 +8,6 @@ const review_1 = __importDefault(require("../../models/review"));
 const request_1 = __importDefault(require("../../models/request"));
 const createReview = async (userId, payload) => {
     const { requestId, rating, comment } = payload;
-    console.log('checking review data', payload);
     const request = await request_1.default.findById(requestId);
     if (!request) {
         throw new Error('Request not found');

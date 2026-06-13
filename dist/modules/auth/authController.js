@@ -50,21 +50,11 @@ const loginController = async (req, res) => {
 exports.loginController = loginController;
 const googleLoginController = async (req, res) => {
     try {
-        const { idToken, credential } = req.body;
-        const token = idToken || credential;
-        if (!token) {
-            return (0, sendResponse_1.default)(res, {
-                statusCode: 400,
-                success: false,
-                message: 'ID token is required',
-                data: null,
-            });
-        }
-        const result = await (0, authService_1.googleLogin)(token);
+        const result = await (0, authService_1.googleLogin)(req.body);
         (0, sendResponse_1.default)(res, {
             statusCode: 200,
             success: true,
-            message: 'Google sign-in successful',
+            message: 'Google login successful',
             data: result,
         });
     }
@@ -73,7 +63,7 @@ const googleLoginController = async (req, res) => {
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,
-            message: error.message || 'Google authentication failed',
+            message: 'Internal server error',
             data: null,
         });
     }

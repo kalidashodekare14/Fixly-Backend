@@ -18,7 +18,6 @@ const overviewInfoController = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error.message);
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,
@@ -31,7 +30,6 @@ exports.overviewInfoController = overviewInfoController;
 const providerInfoController = async (req, res) => {
     try {
         const providerId = req.user.id;
-        console.log('Provider ID:', providerId);
         const providerData = await (0, providerService_1.providerInfo)(providerId);
         (0, sendResponse_1.default)(res, {
             statusCode: 200,
@@ -41,7 +39,6 @@ const providerInfoController = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error.message);
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,
@@ -67,7 +64,6 @@ const providerInfoUpdateController = async (req, res) => {
         if (req.file) {
             updateData.image = req.file.path;
         }
-        console.log(updateData);
         const providerData = await (0, providerService_1.providerInfoUpdate)(userId, updateData);
         (0, sendResponse_1.default)(res, {
             statusCode: 200,
@@ -77,7 +73,6 @@ const providerInfoUpdateController = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error.message);
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,
@@ -99,7 +94,6 @@ const requestInfoController = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error.message);
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,
@@ -121,7 +115,6 @@ const offerCreateController = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error.message);
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,
@@ -143,7 +136,6 @@ const sendOfferedInfoController = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error.message);
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,
@@ -165,7 +157,6 @@ const providerJobsInfoController = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error.message);
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,
@@ -188,7 +179,6 @@ const jobsStatusChangeController = async (req, res) => {
         });
     }
     catch (error) {
-        console.log(error.message);
         (0, sendResponse_1.default)(res, {
             statusCode: 500,
             success: false,

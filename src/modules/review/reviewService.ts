@@ -11,8 +11,6 @@ const createReview = async (
 ) => {
   const { requestId, rating, comment } = payload;
 
-  console.log('checking review data', payload);
-
   const request = await Request.findById(requestId);
 
   if (!request) {

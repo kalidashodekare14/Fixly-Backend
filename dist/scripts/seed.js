@@ -23,10 +23,10 @@ const cities = [
 async function seed() {
     try {
         await mongoose_1.default.connect(MONGO_URI);
-        console.log('✅ DB Connected');
+        // console.log('✅ DB Connected');
         await user_1.default.deleteMany({});
         await provider_1.default.deleteMany({});
-        console.log('🧹 Old data cleared');
+        // console.log('🧹 Old data cleared');
         const hashedPassword = await bcryptjs_1.default.hash('123456', 10);
         // =========================
         // STEP 1: GET EXISTING CATEGORIES
@@ -35,7 +35,7 @@ async function seed() {
         if (!categories.length) {
             throw new Error('❌ No categories found. Please seed categories first.');
         }
-        console.log('📦 Categories loaded:', categories.length);
+        // console.log('📦 Categories loaded:', categories.length);
         // =========================
         // STEP 2: CREATE USER IDS
         // =========================
@@ -79,7 +79,7 @@ async function seed() {
             isVerified: faker_1.faker.datatype.boolean(),
         }));
         await user_1.default.insertMany([...providerUsers, ...customerUsers]);
-        console.log('👤 Users inserted');
+        // console.log('👤 Users inserted');
         // =========================
         // STEP 4: PROVIDERS
         // =========================
@@ -107,10 +107,10 @@ async function seed() {
             rateType: faker_1.faker.helpers.arrayElement(['hourly', 'fixed']),
             isVerified: faker_1.faker.datatype.boolean(),
         }));
-        console.log('📦 Provider count:', providers.length);
+        // console.log('📦 Provider count:', providers.length);
         const result = await provider_1.default.insertMany(providers);
-        console.log('✅ Providers inserted:', result.length);
-        console.log('🎉 SEED COMPLETED SUCCESSFULLY');
+        // console.log('✅ Providers inserted:', result.length);
+        // console.log('🎉 SEED COMPLETED SUCCESSFULLY');
         process.exit(0);
     }
     catch (error) {

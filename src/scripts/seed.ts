@@ -22,11 +22,11 @@ const cities = [
 async function seed() {
   try {
     await mongoose.connect(MONGO_URI);
-    console.log('✅ DB Connected');
+    // console.log('✅ DB Connected');
 
     await User.deleteMany({});
     await Provider.deleteMany({});
-    console.log('🧹 Old data cleared');
+    // console.log('🧹 Old data cleared');
 
     const hashedPassword = await bcrypt.hash('123456', 10);
 
@@ -39,7 +39,7 @@ async function seed() {
       throw new Error('❌ No categories found. Please seed categories first.');
     }
 
-    console.log('📦 Categories loaded:', categories.length);
+    // console.log('📦 Categories loaded:', categories.length);
 
     // =========================
     // STEP 2: CREATE USER IDS
@@ -94,7 +94,7 @@ async function seed() {
     }));
 
     await User.insertMany([...providerUsers, ...customerUsers]);
-    console.log('👤 Users inserted');
+    // console.log('👤 Users inserted');
 
     // =========================
     // STEP 4: PROVIDERS
@@ -136,13 +136,13 @@ async function seed() {
       isVerified: faker.datatype.boolean(),
     }));
 
-    console.log('📦 Provider count:', providers.length);
+    // console.log('📦 Provider count:', providers.length);
 
     const result = await Provider.insertMany(providers);
 
-    console.log('✅ Providers inserted:', result.length);
+    // console.log('✅ Providers inserted:', result.length);
 
-    console.log('🎉 SEED COMPLETED SUCCESSFULLY');
+    // console.log('🎉 SEED COMPLETED SUCCESSFULLY');
 
     process.exit(0);
   } catch (error) {

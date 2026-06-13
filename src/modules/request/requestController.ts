@@ -46,8 +46,6 @@ const createRequestController = async (req: Request, res: Response) => {
       location = JSON.parse(req.body.location);
     }
 
-    console.log('checking request id', req.body.providerId);
-
     const requestData = {
       category: req.body.category,
       title: req.body.title,

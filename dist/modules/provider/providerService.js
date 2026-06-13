@@ -133,7 +133,6 @@ const overviewInfo = async (userId) => {
         .limit(5)
         .populate('category', 'label')
         .populate('user', 'name');
-    console.log('checking recent requests', recentRequests);
     return {
         pendingRequests,
         activeJobs,
