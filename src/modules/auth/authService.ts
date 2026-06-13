@@ -5,7 +5,12 @@ import IUser from '../../types/user';
 import User from '../../models/user';
 import Provider from '../../models/provider';
 
-const googleLogin = async (userData: { googleId: string; name: string; email: string; image?: string }) => {
+const googleLogin = async (userData: {
+  googleId: string;
+  name: string;
+  email: string;
+  image?: string;
+}) => {
   const { googleId, name, email, image } = userData;
 
   let user = await User.findOne({ $or: [{ googleId }, { email }] });
@@ -17,7 +22,13 @@ const googleLogin = async (userData: { googleId: string; name: string; email: st
     await user.save();
   } else {
     const placeholderPassword = crypto.randomBytes(20).toString('hex');
-    user = await User.create({ googleId, name, email, image, password: placeholderPassword });
+    user = await User.create({
+      googleId,
+      name,
+      email,
+      image,
+      password: placeholderPassword,
+    });
   }
 
   const token = generateToken({ id: user._id.toString() });
