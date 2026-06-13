@@ -1,6 +1,28 @@
 import { Request, Response } from 'express';
-import { userInfo, updateUserInfo } from './userService';
+import { userInfo, updateUserInfo, getNavbarProfile } from './userService';
 import sendResponse from '../../utils/sendResponse';
+
+const getMyProfileController = async (req: Request, res: Response) => {
+  try {
+    const result = await getNavbarProfile(req.user.id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: 'Profile retrieved successfully',
+      data: result,
+    });
+  } catch (error) {
+    console.error(error);
+
+    sendResponse(res, {
+      success: false,
+      statusCode: 500,
+      message: 'Failed to retrieve profile',
+      data: null,
+    });
+  }
+};
 
 const userInfoController = async (req: Request, res: Response) => {
   try {
@@ -46,4 +68,4 @@ const updateUserInfoController = async (req: Request, res: Response) => {
   }
 };
 
-export { userInfoController, updateUserInfoController };
+export { getMyProfileController, userInfoController, updateUserInfoController };

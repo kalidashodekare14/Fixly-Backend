@@ -12,7 +12,6 @@ const createReviewController = async (req: Request, res: Response) => {
       data: review,
     });
   } catch (error: any) {
-    console.log('review error', error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,

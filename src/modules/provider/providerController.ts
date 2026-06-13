@@ -24,7 +24,6 @@ const overviewInfoController = async (req: Request, res: Response) => {
       message: 'Overview information get successfully',
     });
   } catch (error: any) {
-    console.log(error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -37,7 +36,6 @@ const overviewInfoController = async (req: Request, res: Response) => {
 const providerInfoController = async (req: Request, res: Response) => {
   try {
     const providerId = req.user.id;
-    console.log('Provider ID:', providerId);
     const providerData = await providerInfo(providerId);
     sendResponse(res, {
       statusCode: 200,
@@ -46,7 +44,6 @@ const providerInfoController = async (req: Request, res: Response) => {
       message: 'Provider information successfully',
     });
   } catch (error: any) {
-    console.log(error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -77,8 +74,6 @@ const providerInfoUpdateController = async (req: Request, res: Response) => {
       updateData.image = req.file.path;
     }
 
-    console.log(updateData);
-
     const providerData = await providerInfoUpdate(userId, updateData);
     sendResponse(res, {
       statusCode: 200,
@@ -87,7 +82,6 @@ const providerInfoUpdateController = async (req: Request, res: Response) => {
       message: 'Provider information updated successfully',
     });
   } catch (error: any) {
-    console.log(error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -108,7 +102,6 @@ const requestInfoController = async (req: Request, res: Response) => {
       message: 'Request information retrieved successfully',
     });
   } catch (error: any) {
-    console.log(error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -129,7 +122,6 @@ const offerCreateController = async (req: Request, res: Response) => {
       message: 'Offer created/updated successfully',
     });
   } catch (error: any) {
-    console.log(error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -150,7 +142,6 @@ const sendOfferedInfoController = async (req: Request, res: Response) => {
       message: 'Request information retrieved successfully',
     });
   } catch (error: any) {
-    console.log(error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -171,7 +162,6 @@ const providerJobsInfoController = async (req: Request, res: Response) => {
       message: 'Provider Jobs information successfully',
     });
   } catch (error: any) {
-    console.log(error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,
@@ -193,7 +183,6 @@ const jobsStatusChangeController = async (req: Request, res: Response) => {
       message: 'Job status change successfully',
     });
   } catch (error: any) {
-    console.log(error.message);
     sendResponse(res, {
       statusCode: 500,
       success: false,

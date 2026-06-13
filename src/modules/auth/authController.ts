@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
-import { registerUser, loginUser } from './authService';
+import { registerUser, loginUser, googleLogin } from './authService';
 import sendResponse from '../../utils/sendResponse';
 
-// Controller for user registration
 const signUpController = async (req: Request, res: Response) => {
   try {
     const result = await registerUser(req.body);
@@ -23,7 +22,6 @@ const signUpController = async (req: Request, res: Response) => {
   }
 };
 
-// Controller for user login
 const loginController = async (req: Request, res: Response) => {
   try {
     const result = await loginUser(req.body);
@@ -44,4 +42,24 @@ const loginController = async (req: Request, res: Response) => {
   }
 };
 
-export { signUpController, loginController };
+const googleLoginController = async (req: Request, res: Response) => {
+  try {
+    const result = await googleLogin(req.body);
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: 'Google login successful',
+      data: result,
+    });
+  } catch (error) {
+    console.error('Google login error:', error);
+    sendResponse(res, {
+      statusCode: 500,
+      success: false,
+      message: 'Internal server error',
+      data: null,
+    });
+  }
+};
+
+export { signUpController, loginController, googleLoginController };

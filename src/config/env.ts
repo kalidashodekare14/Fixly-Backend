@@ -10,4 +10,6 @@ export const config = {
   SSL_COMMERZ_STORE_PASSWORD: process.env.SSL_COMMERZ_STORE_PASSWORD || '',
   BACKEND_URL: process.env.BACKEND_URL || 'http://localhost:5000',
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
 };

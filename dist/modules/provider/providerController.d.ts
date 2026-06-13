@@ -1,0 +1,12 @@
+import { Request, Response } from 'express';
+declare const overviewInfoController: (req: Request, res: Response) => Promise<void>;
+declare const providerInfoController: (req: Request, res: Response) => Promise<void>;
+declare const providerInfoUpdateController: (req: Request, res: Response) => Promise<void>;
+declare const requestInfoController: (req: Request, res: Response) => Promise<void>;
+declare const offerCreateController: (req: Request, res: Response) => Promise<void>;
+declare const sendOfferedInfoController: (req: Request, res: Response) => Promise<void>;
+declare const providerJobsInfoController: (req: Request, res: Response) => Promise<void>;
+declare const jobsStatusChangeController: (req: Request, res: Response) => Promise<void>;
+declare const getProviderReviewsController: (req: any, res: any) => Promise<void>;
+declare const getProviderPaymentHistoryController: (req: any, res: any) => Promise<void>;
+export { overviewInfoController, providerInfoController, providerInfoUpdateController, requestInfoController, offerCreateController, sendOfferedInfoController, providerJobsInfoController, jobsStatusChangeController, getProviderReviewsController, getProviderPaymentHistoryController, };

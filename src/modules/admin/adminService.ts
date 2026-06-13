@@ -3,6 +3,7 @@ import Provider from '../../models/provider';
 import User from '../../models/user';
 import Request from '../../models/request';
 import Payment from '../../models/payment';
+import Review from '../../models/review';
 import mongoose from 'mongoose';
 
 const adminOverviewInfo = async () => {
@@ -428,6 +429,85 @@ const paymentsManage = async (queryData: any) => {
   };
 };
 
+// Manage reviews
+const reviewsManage = async (queryData: any) => {
+  const { rating, search, currentPage, dataLimit } = queryData;
+
+  // KPI info
+  const totalReviews = await Review.countDocuments();
+  const averageRating = await Review.aggregate([
+    { $group: { _id: null, avg: { $avg: '$rating' } } },
+  ]);
+  const rating5 = await Review.countDocuments({ rating: 5 });
+  const rating4 = await Review.countDocuments({ rating: 4 });
+  const rating3 = await Review.countDocuments({ rating: 3 });
+  const rating2 = await Review.countDocuments({ rating: 2 });
+  const rating1 = await Review.countDocuments({ rating: 1 });
+
+  // Data filter
+  const filter: any = {};
+
+  if (rating && rating !== 'all') {
+    filter.rating = Number(rating);
+  }
+
+  if (search) {
+    const matchedUsers = await User.find({
+      $or: [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ],
+    }).select('_id');
+
+    const matchedProviders = await Provider.find({
+      user: { $in: matchedUsers.map((u) => u._id) },
+    }).select('_id');
+
+    filter.$or = [
+      { user: { $in: matchedUsers.map((u) => u._id) } },
+      { provider: { $in: matchedProviders.map((p) => p._id) } },
+      { comment: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  // Pagination
+  const page = Number(currentPage) || 1;
+  const limit = Number(dataLimit) || 10;
+  const skip = (page - 1) * limit;
+
+  const reviews = await Review.find(filter)
+    .populate({ path: 'user', select: 'name email image' })
+    .populate({
+      path: 'provider',
+      populate: { path: 'user', select: 'name email image' },
+    })
+    .populate({ path: 'request', select: 'title' })
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  const total = await Review.countDocuments(filter);
+
+  return {
+    kpiInfo: {
+      totalReviews,
+      averageRating: averageRating.length > 0 ? averageRating[0].avg : 0,
+      rating5,
+      rating4,
+      rating3,
+      rating2,
+      rating1,
+    },
+    data: reviews,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
 export {
   usersManage,
   adminOverviewInfo,
@@ -435,4 +515,5 @@ export {
   requestsManage,
   createCategories,
   paymentsManage,
+  reviewsManage,
 };
