@@ -1,23 +1,42 @@
-// External dependencies
+import crypto from 'crypto';
+import axios from 'axios';
 import generateToken from '../../utils/tokenService';
-
-// Internal dependencies
 import IUser from '../../types/user';
 import User from '../../models/user';
 import Provider from '../../models/provider';
 
+const googleLogin = async (userData: { googleId: string; name: string; email: string; image?: string }) => {
+  const { googleId, name, email, image } = userData;
+
+  let user = await User.findOne({ $or: [{ googleId }, { email }] });
+
+  if (user) {
+    user.googleId = googleId;
+    user.name = name;
+    if (image) user.image = image;
+    await user.save();
+  } else {
+    const placeholderPassword = crypto.randomBytes(20).toString('hex');
+    user = await User.create({ googleId, name, email, image, password: placeholderPassword });
+  }
+
+  const token = generateToken({ id: user._id.toString() });
+
+  const userObject = user.toObject();
+  delete (userObject as { password?: string }).password;
+
+  return { user: userObject, token };
+};
+
 const registerUser = async (userData: IUser) => {
   const { name, email, password, role } = userData;
-  // Check if user already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new Error('User already exists');
   }
-  // save user data
   const newUser = await User.create({ name, email, password, role });
 
   if (role === 'provider') {
-    // Create provider profile for the new user
     await Provider.create({ user: newUser._id });
   }
 
@@ -45,4 +64,4 @@ const loginUser = async (userData: IUser) => {
   return { user: userObject, token };
 };
 
-export { registerUser, loginUser };
+export { registerUser, loginUser, googleLogin };

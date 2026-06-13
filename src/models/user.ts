@@ -22,6 +22,7 @@ export interface IUser extends Document {
   totalReviews: number;
   comparePassword(candidatePassword: string): Promise<boolean>;
   status: 'active' | 'suspend';
+  googleId?: string;
 }
 
 const userSchema = new Schema<IUser>(
@@ -86,6 +87,11 @@ const userSchema = new Schema<IUser>(
     status: {
       type: String,
       enum: ['active', 'suspend'],
+    },
+    googleId: {
+      type: String,
+      sparse: true,
+      unique: true,
     },
   },
   {

@@ -4,4 +4,5 @@ export default interface IUser {
   email: string;
   password: string;
   role: 'user' | 'provider';
+  googleId?: string;
 }

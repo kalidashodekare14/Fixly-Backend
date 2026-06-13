@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const router = express_1.default.Router();
+const providerController_1 = require("./providerController");
+const authMiddleware_1 = require("../../middlewares/authMiddleware");
+const multerStorage_1 = require("../../config/multerStorage");
+router.get('/provider_overview', authMiddleware_1.authMiddleware, providerController_1.overviewInfoController);
+router.get('/', authMiddleware_1.authMiddleware, providerController_1.providerInfoController);
+router.put('/', authMiddleware_1.authMiddleware, multerStorage_1.upload.single('image'), providerController_1.providerInfoUpdateController);
+router.get('/requests', authMiddleware_1.authMiddleware, providerController_1.requestInfoController);
+router.put('/offer', authMiddleware_1.authMiddleware, providerController_1.offerCreateController);
+router.get('/send_offered', authMiddleware_1.authMiddleware, providerController_1.sendOfferedInfoController);
+router.get('/jobs', authMiddleware_1.authMiddleware, providerController_1.providerJobsInfoController);
+router.put('/job_status', authMiddleware_1.authMiddleware, providerController_1.jobsStatusChangeController);
+router.get('/provider-reviews', authMiddleware_1.authMiddleware, providerController_1.getProviderReviewsController);
+router.get('/provider_payments', authMiddleware_1.authMiddleware, providerController_1.getProviderPaymentHistoryController);
+exports.default = router;
